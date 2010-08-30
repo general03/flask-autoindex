@@ -6,7 +6,7 @@ Generates index page like mod_autoindex. Under development.
 Usage
 =====
 
-.. sourcecode:: python
+If you want to browse your ``public_html`` folder, follow these::
 
    import os.path
    import flask
