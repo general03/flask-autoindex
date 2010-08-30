@@ -38,8 +38,10 @@ class AutoIndex(Module):
                                    path=titlepath,
                                    entries=entries,
                                    sort_by=sort_by)
-        else:
+        elif os.path.isfile(abspath):
             return send_file(abspath)
+        else:
+            return abort(404)
 
     def send_static_file(self, filename):
         """Serves a static file when it is in the autoindex's static directory.
