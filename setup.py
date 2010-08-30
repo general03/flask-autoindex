@@ -27,6 +27,7 @@ setup(name="Flask-AutoIndex",
       zip_safe=False,
       platforms="any",
       install_requires=["Flask"],
+      test_suite="tests",
       classifiers=[
           "Environment :: Web Environment",
           "Intended Audience :: Developers",
