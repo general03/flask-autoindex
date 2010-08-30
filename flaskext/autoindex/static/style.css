@@ -1,0 +1,60 @@
+body, table {
+    font-family: sans-serif;
+    font-size: 14px;
+}
+
+a:link, a:visited {
+    text-decoration: none;
+}
+a:link {
+    color: #36c;
+}
+a:visited {
+    color: #333;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    font-size: 20px;
+    color: #234;
+}
+
+table {
+    border-collapse: collapse;
+}
+th {
+    font-size: 11px;
+}
+th a:link, th a:visited {
+    margin: 0 10px;
+    color: #333;
+}
+tbody {
+    border: solid #ccc;
+    border-width: 1px 0;
+}
+hr {
+    margin: 0;
+    border: none;
+}
+td {
+    padding: 5px;
+    font-size: 11px;
+    color: #333;
+}
+td a {
+    margin-right: 40px;
+    font-size: 14px;
+}
+td.modified, td.size {
+    text-align: right;
+}
+
+address {
+    padding-top: 5px;
+    font-size: 11px;
+    color: #333;
+}
+

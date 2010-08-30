@@ -1,0 +1,34 @@
+{% macro entry(ent) %}
+  <tr>
+    {% set icon = ent.guess_icon() %}
+    <td class="icon">
+      {% if icon %}
+        <img src="{{ url_for("static", filename=icon|e) }}" />
+      {% endif %}
+    </td>
+    <td class="name"><a href="/{{ ent.path|e }}">
+      {%- if ent.name == ".." -%}
+        Parent folder
+      {%- else -%}
+        {{ ent.name|e }}
+      {%- endif -%}
+    </a></td>
+    <td class="modified">{{ ent.modified }}</td>
+    <td class="size">
+      {% if ent.size %}
+        {{ ent.size|filesizeformat }}
+      {% else %}
+        -
+      {% endif %}
+    </td>
+  </tr>
+{% endmacro %}
+
+{% macro thead() %}
+  <tr>
+    <th class="name" colspan="2"><a href="?sort_by=name">Name</a></th>
+    <th class="modified"><a href="?sort_by=modified">Last modified</a></th>
+    <th class="size"><a href="?sort_by=size">Size</a></th>
+  </tr>
+{% endmacro %}
+
