@@ -6,7 +6,7 @@ Generates index page like mod_autoindex. Under development.
 Usage
 =====
 
-.. sourcecode::
+.. sourcecode:: python
 
    import os.path
    import flask
