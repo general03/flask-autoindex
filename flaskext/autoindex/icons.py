@@ -1,5 +1,3 @@
-from mimetypes import guess_type
-from fnmatch import fnmatch
 from .entry import File, Folder, Default
 
 
@@ -51,11 +49,9 @@ by_extension = [
     ("vcard.png", "vcf"),
     ("page_white.png", Default)
 ]
-
 by_filename = [
     ("page_white_gear.png", ["Makefile", "Rakefile"])
 ]
-
 by_mimetype = [
     ("page_white_text.png", "text/*"),
     ("picture.png", "image/*"),
@@ -64,38 +60,20 @@ by_mimetype = [
 ]
 
 
-def make_extension_rule(ext):
-    if isinstance(ext, basestring):
-        return lambda ent: ent.ext == ext
-    elif getattr(ext, "__iter__", False):
-        return lambda ent: ent.ext in ext
-
-def make_filename_rule(name):
-    if isinstance(name, basestring):
-        return lambda ent: ent.name == name
-    elif getattr(name, "__iter__", False):
-        return lambda ent: ent.name in name
-
-def make_mimetype_rule(mimetype):
-    rule = lambda ent: fnmatch(guess_type(ent.name)[0] or "", mimetype)
-    if isinstance(mimetype, basestring):
-        return rule
-    elif getattr(mimetype, "__iter__", False):
-        return lambda ent: all(map(rule, mimetype))
+def to_list(val):
+    if not getattr(val, "__iter__", False):
+        return [val]
+    else:
+        return val
 
 
-for icon, ext in by_extension:
-    rule = make_extension_rule(ext)
-    if rule:
-        File.add_icon_rule(icon, rule)
-
-for icon, name in by_filename:
-    rule = make_filename_rule(name)
-    if rule:
-        File.add_icon_rule(icon, rule)
-
-for icon, mimetype in by_mimetype:
-    rule = make_mimetype_rule(mimetype)
-    if rule:
-        File.add_icon_rule(icon, rule)
+for icon, exts in by_extension:
+    for ext in to_list(exts):
+        File.add_icon_rule_by_ext(icon, ext)
+for icon, filenames in by_filename:
+    for name in to_list(filenames):
+        File.add_icon_rule_by_name(icon, name)
+for icon, mimetypes in by_mimetype:
+    for mimetype in to_list(mimetypes):
+        File.add_icon_rule_by_mimetype(icon, mimetype)
 

@@ -28,6 +28,8 @@ class AutoIndex(object):
         assert isinstance(idx, AutoIndexModule)
     """
 
+    icon_map = []
+
     def _register_shared_autoindex(self, state=None, app=None):
         """Registers a magic module named __autoindex__."""
         app = app or state.app
@@ -59,9 +61,8 @@ class AutoIndex(object):
         abspath = os.path.join(self.browse_root, path)
         if os.path.isdir(abspath):
             sort_by = request.args.get("sort_by", "name")
-            entries = Entry.browse(path,
-                                   root=self.browse_root,
-                                   sort_by=sort_by)
+            entries = Entry.browse(path, autoindex=self,
+                                   root=self.browse_root, sort_by=sort_by)
             titlepath = "/" + ("" if path == "." else path)
             prefix = self.template_prefix
             options = dict(path=titlepath, entries=entries, sort_by=sort_by)
@@ -70,6 +71,22 @@ class AutoIndex(object):
             return send_file(abspath)
         else:
             return abort(404)
+
+    def add_icon_rule(self, icon, rule=None, ext=None, mimetype=None,
+                      name=None, filename=None, foldername=None):
+        if name:
+            filename = name
+            foldername = name
+        if ext:
+            File.add_icon_rule_by_ext.im_func(self, icon, ext)
+        if mimetype:
+            File.add_icon_rule_by_mimetype.im_func(self, icon, mimetype)
+        if filename:
+            File.add_icon_rule_by_name.im_func(self, icon, filename)
+        if foldername:
+            Folder.add_icon_rule_by_name.im_func(self, icon, foldername)
+        if callable(rule):
+            Entry.add_icon_rule.im_func(self, icon, rule)
 
     @property
     def template_prefix(self):

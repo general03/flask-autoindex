@@ -1,6 +1,8 @@
 import os.path
 import re
 from datetime import datetime
+from mimetypes import guess_type
+from fnmatch import fnmatch
 
 
 Default = None
@@ -19,7 +21,7 @@ class Entry(object):
     ICONS_DIRNAME = "icons"
     HIDDEN = re.compile("^\.")
 
-    def __new__(cls, path, root=None):
+    def __new__(cls, path, root=None, autoindex=None):
         """Returns a file or folder instance."""
         abspath = os.path.join(root, path)
         if cls is not Entry:
@@ -31,7 +33,7 @@ class Entry(object):
         else:
             raise IOError("'{0}' does not exists.".format(fullpath))
 
-    def __init__(self, path, root=None):
+    def __init__(self, path, root=None, autoindex=None):
         """Initializes an entry instance."""
         self.path = path
         if root:
@@ -41,6 +43,7 @@ class Entry(object):
         self.abspath = os.path.join(self.root, self.path)
         self.name = os.path.basename(self.abspath)
         self.hidden = bool(self.HIDDEN.match(self.name))
+        self.autoindex = autoindex
 
     @property
     def modified(self):
@@ -51,9 +54,17 @@ class Entry(object):
     def add_icon_rule(cls, icon, rule):
         cls.icon_map.append((icon, rule))
 
+    @classmethod
+    def add_icon_rule_by_name(cls, icon, name):
+        cls.add_icon_rule(icon, lambda ent: ent.name == name)
+
     def guess_icon(self):
         try:
-            for icon, rule in self.icon_map:
+            if self.autoindex:
+                icon_map = self.autoindex.icon_map + self.icon_map
+            else:
+                icon_map = self.icon_map
+            for icon, rule in icon_map:
                 if rule(self):
                     return os.path.join(self.ICONS_DIRNAME, icon)
         except AttributeError:
@@ -64,7 +75,8 @@ class Entry(object):
             raise GuessError("There is no matched icon.")
 
     @classmethod
-    def browse(cls, path, root=None, sort_by="name", show_hidden=False):
+    def browse(cls, path, root=None, autoindex=None, sort_by="name",
+               show_hidden=False):
         def compare(ent1, ent2):
             if type(ent1) is not type(ent2):
                 return 1 if type(ent1) is File else -1
@@ -77,7 +89,8 @@ class Entry(object):
         if not os.path.samefile(abspath, root):
             yield ParentFolder(path, root=root)
         entries = os.listdir(abspath)
-        entries = (cls(os.path.join(path, name), root=root) for name in entries)
+        entries = (cls(os.path.join(path, name), root, autoindex) \
+                   for name in entries)
         entries = sorted(entries, cmp=compare)
         for ent in entries:
             if show_hidden or not ent.hidden:
@@ -91,13 +104,22 @@ class File(Entry):
     default_icon = "page_white.png"
     icon_map = []
 
-    def __init__(self, path, root=None):
-        super(File, self).__init__(path, root)
+    def __init__(self, path, root=None, autoindex=None):
+        super(File, self).__init__(path, root, autoindex)
         self.size = os.path.getsize(self.abspath)
         try:
             self.ext = re.search(self.EXTENSION, self.name).group(1)
         except AttributeError:
             self.ext = None
+
+    @classmethod
+    def add_icon_rule_by_ext(cls, icon, ext):
+        cls.add_icon_rule(icon, lambda ent: ent.ext == ext)
+
+    @classmethod
+    def add_icon_rule_by_mimetype(cls, icon, mimetype):
+        rule = lambda ent: fnmatch(guess_type(ent.name)[0] or "", mimetype)
+        cls.add_icon_rule(icon, rule)
 
 
 class Folder(Entry):
