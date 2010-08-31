@@ -11,9 +11,9 @@ __name__ = "__autoindex__"
 
 
 class AutoIndex(object):
-    """This class makes the Flask application or module to serve generated
-    index page automacally. The wrapped application or module will route ``/``
-    and ``/<path:path>``.
+    """This class makes the Flask application or module to serve automacally
+    generated index page. The wrapped site(application or module) will route
+    ``/`` and ``/<path:path>``.
 
     You can make your application to serve generated index::
 
