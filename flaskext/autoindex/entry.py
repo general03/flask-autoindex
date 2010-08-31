@@ -7,6 +7,14 @@ Default = None
 
 
 class Entry(object):
+    """This class wraps file or folder. It is an abstract class, but it returns
+    derived class. You can make an instance such as::
+
+        folder = Entry("/home/someone/public_html")
+        assert isinstance(foler, Folder)
+        file = Entry("/home/someone/public_html/favicon.ico")
+        assert isinstance(file, File)
+    """
 
     ICONS_DIRNAME = "icons"
     HIDDEN = re.compile("^\.")
@@ -24,6 +32,7 @@ class Entry(object):
             raise IOError("'{0}' does not exists.".format(fullpath))
 
     def __init__(self, path, root=None):
+        """Initializes an entry instance."""
         self.path = path
         if root:
             self.root = root

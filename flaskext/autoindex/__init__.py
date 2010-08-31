@@ -10,23 +10,52 @@ __dir__ = os.path.abspath(os.path.dirname(__file__))
 __name__ = "__autoindex__"
 
 
-class AutoIndex(Module):
+class AutoIndex(object):
+    """This class makes the Flask application or module to serve generated
+    index page automacally. The wrapped application or module will route ``/``
+    and ``/<path:path>``.
 
-    def _register_autoindex(self, state):
+    You can make your application to serve generated index::
+
+        app = Flask(__name__)
+        idx = AutoIndex(app, "/home/someone/public_html")
+        assert isinstance(idx, AutoIndexApplication)
+
+    Or with module::
+
+        mod = Module(__name__, subdomain="mod")
+        idx = AutoIndex(mod, "/home/otherone/public_html")
+        assert isinstance(idx, AutoIndexModule)
+    """
+
+    def _register_shared_autoindex(self, state=None, app=None):
         """Registers a magic module named __autoindex__."""
-        if __name__ not in state.app.modules:
-            state.app.modules[__name__] = self
+        app = app or state.app
+        if __name__ not in app.modules:
+            app.modules[__name__] = self.base
 
-    def __init__(self, import_name, browse_root=None, **options):
-        """Initializes an autoindex module."""
-        super(AutoIndex, self).__init__(import_name, **options)
-        self._record(self._register_autoindex)
-        self.browse_root = browse_root
+    def __new__(cls, base, browse_root=None):
+        """Checks a base."""
+        if cls is not AutoIndex:
+            return object.__new__(cls)
+        elif isinstance(base, Flask):
+            return AutoIndexApplication(base, browse_root)
+        elif isinstance(base, Module):
+            return AutoIndexModule(base, browse_root)
+        else:
+            raise TypeError("'base' should be Flask or Module.")
+
+    def __init__(self, base, browse_root=None):
+        """Initializes an autoindex instance. And overrides ``jinja_loader``
+        of the wrapped application or module to :meth:`AutoIndex.jinja_loader`.
+        """
+        self.base, self.browse_root = base, browse_root
+        self.base.jinja_loader = self.jinja_loader
         for rule in "/", "/<path:path>":
-            self.browse = self.route(rule)(self.browse)
+            self.browse = self.base.route(rule)(self.browse)
 
     def browse(self, path="."):
-        """Browses the files in path."""
+        """Browses the files from the path."""
         abspath = os.path.join(self.browse_root, path)
         if os.path.isdir(abspath):
             sort_by = request.args.get("sort_by", "name")
@@ -34,29 +63,58 @@ class AutoIndex(Module):
                                    root=self.browse_root,
                                    sort_by=sort_by)
             titlepath = "/" + ("" if path == "." else path)
-            return render_template("{0}/browse.html".format(self.name),
-                                   path=titlepath,
-                                   entries=entries,
-                                   sort_by=sort_by)
+            prefix = self.template_prefix
+            options = dict(path=titlepath, entries=entries, sort_by=sort_by)
+            return render_template("{0}browse.html".format(prefix), **options)
         elif os.path.isfile(abspath):
             return send_file(abspath)
         else:
             return abort(404)
 
+    @property
+    def template_prefix(self):
+        raise NotImplementedError()
+
     def send_static_file(self, filename):
-        """Serves a static file when it is in the autoindex's static directory.
-        Otherwise it serve from module's static directory.
+        """Serves a static file. It finds the file from autoindex internal
+        static directory first. If it failed to find the file, it finds from
+        the wrapped application or module's static directory.
         """
-        module_static = os.path.join(__dir__, "static")
-        if os.path.isfile(os.path.join(module_static, filename)):
-            return send_from_directory(module_static, filename)
+        global_static = os.path.join(__dir__, "static")
+        if os.path.isfile(os.path.join(global_static, filename)):
+            static = global_static
         else:
-            return super(AutoIndex, self).send_static_file(filename)
+            static = os.path.join(self.base.root_path, "static")
+        return send_from_directory(static, filename)
 
     @cached_property
     def jinja_loader(self):
-        """Merges a pre-loaded templates folder."""
+        """The jinja loader with merged template paths."""
         paths = [os.path.join(path, "templates") \
-                 for path in __dir__, self.root_path]
+                 for path in __dir__, self.base.root_path]
         return FileSystemLoader(paths)
+
+
+class AutoIndexApplication(AutoIndex):
+
+    template_prefix = ""
+
+    def __init__(self, app, browse_root=None):
+        super(AutoIndexApplication, self).__init__(app, browse_root)
+        self.app = app
+        self.app.view_functions["static"] = self.send_static_file
+        self._register_shared_autoindex(app=self.app)
+
+
+class AutoIndexModule(AutoIndex):
+
+    def __init__(self, mod, browse_root=None):
+        super(AutoIndexModule, self).__init__(mod, browse_root)
+        self.mod = self.base
+        self.mod._record(self._register_shared_autoindex)
+        self.mod.send_static_file = self.send_static_file
+
+    @cached_property
+    def template_prefix(self):
+        return self.mod.name + "/"
 
