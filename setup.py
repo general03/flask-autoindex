@@ -18,6 +18,11 @@ except ImportError:
     from distutils.core import setup
 
 
+def run_tests():
+    from tests import suite
+    return suite()
+
+
 setup(
     name="Flask-AutoIndex",
     version="0.1.0",
@@ -37,7 +42,7 @@ setup(
     install_requires=[
         "Flask"
     ],
-    test_suite="tests",
+    test_suite="__main__.run_tests",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
