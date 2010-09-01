@@ -27,8 +27,12 @@ Flask-AutoIndex is only available on GitHub now. Check out right now::
 How to Use
 ==========
 
-Flask-AutoIndex is easy and extensible. It supports flask application and
-module. It means we can make variety autoindex applications in one process.
+Flask-AutoIndex is easy and extensible. It supports flask application.
+
+..
+    TODO:
+    - change "flask application" to "flask application and module"
+    - add "It means we can make variety autoindex applications in one process."
 
 We will make the application in flask application. There is a basic usage::
 
@@ -41,26 +45,28 @@ We will make the application in flask application. There is a basic usage::
 After running the application, ``http://localhost/`` serves a generated index
 page which contains the file and folder list in current directory.
 
-If you want to make the application in flask module, follow the below exmaple::
+..
+    If you want to make the application in flask module, follow the below
+    exmaple::
 
-    # path: testapp/testmodule/__init__.py
-    from flask import Module
-    from flaskext.autoindex import AutoIndex
-    mod = Module(__name__, subdomain="test")
-    idx = AutoIndex(mod, browse_root="/var/www/public_html")
+        # path: testapp/testmodule/__init__.py
+        from flask import Module
+        from flaskext.autoindex import AutoIndex
+        mod = Module(__name__, subdomain="test")
+        idx = AutoIndex(mod, browse_root="/var/www/public_html")
 
-::
+    ::
 
-    # path: testapp/__init__.py
-    from flask import Flask
-    from testmodule import mod
-    app = Flask(__name__)
-    app.config["SERVER_NAME"] = "localhost"
-    app.register_module(mod)
+        # path: testapp/__init__.py
+        from flask import Flask
+        from testmodule import mod
+        app = Flask(__name__)
+        app.config["SERVER_NAME"] = "localhost"
+        app.register_module(mod)
 
-This time, ``http://localhost/`` served nothing. But ``http://test.localhost/``
-serves the file and folder list in ``/var/www/public_html``. You can register
-more modules as same way.
+    This time, ``http://localhost/`` served nothing. But
+    ``http://test.localhost/`` serves the file and folder list in
+    ``/var/www/public_html``. You can register more modules as same way.
 
 Customizing
 ===========
@@ -99,8 +105,9 @@ Configuration
 .. autoclass:: AutoIndexApplication
    :members:
 
-.. autoclass:: AutoIndexModule
-   :members:
+..
+    .. autoclass:: AutoIndexModule
+       :members:
 
 Models
 ``````
