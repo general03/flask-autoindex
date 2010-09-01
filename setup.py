@@ -30,7 +30,7 @@ def run_tests():
 
 setup(
     name="Flask-AutoIndex",
-    version="0.1.2",
+    version="0.2.0",
     url="http://github.com/sublee/flask-autoindex",
     license="BSD",
     author="Lee Heung-sub",
@@ -39,14 +39,13 @@ setup(
     long_description=__doc__,
     packages=["flaskext", "flaskext.autoindex"],
     include_package_data=True,
-    package_data={"flaskext.autoindex": ["static/icons/*",
-                                         "static/style.css",
-                                         "templates/*"]},
+    package_data={"flaskext.autoindex": ["static/*", "templates/*"]},
     namespace_packages=["flaskext"],
     zip_safe=False,
     platforms="any",
     install_requires=[
-        "Flask"
+        "Flask",
+        "flask-silk"
     ],
     test_suite="__main__.run_tests",
     classifiers=[
