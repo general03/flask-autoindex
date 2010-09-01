@@ -75,16 +75,21 @@ class Entry(object):
             raise GuessError("There is no matched icon.")
 
     @classmethod
-    def browse(cls, path, root=None, autoindex=None, sort_by="name",
-               show_hidden=False):
+    def browse(cls, path, root=None, autoindex=None,
+               sort_by="name", order=1, show_hidden=False):
         def compare(ent1, ent2):
-            if type(ent1) is not type(ent2):
-                return 1 if type(ent1) is File else -1
-            else:
-                try:
-                    return cmp(getattr(ent1, sort_by), getattr(ent2, sort_by))
-                except AttributeError:
-                    return -1
+            def asc():
+                if sort_by != "modified" and type(ent1) is not type(ent2):
+                    return 1 if type(ent1) is File else -1
+                else:
+                    try:
+                        return cmp(getattr(ent1, sort_by),
+                                   getattr(ent2, sort_by))
+                    except AttributeError:
+                        return cmp(getattr(ent1, "name"),
+                                   getattr(ent2, "name"))
+                    #return -order
+            return asc() * order
         abspath = os.path.join(root, path)
         if not os.path.samefile(abspath, root):
             yield ParentFolder(path, root=root)
@@ -130,7 +135,7 @@ class Folder(Entry):
 
 class ParentFolder(Folder):
 
-    default_icon = "arrow_left.png"
+    default_icon = "arrow_turn_up.png"
     icon_map = []
 
     def __init__(self, path, root=None):

@@ -1,4 +1,5 @@
 import os.path
+import re
 from flask import *
 from werkzeug import cached_property
 from jinja2 import FileSystemLoader
@@ -59,14 +60,19 @@ class AutoIndex(object):
     def browse(self, path="."):
         """Browses the files from the path."""
         abspath = os.path.join(self.browse_root, path)
+        path = re.sub("\/*$", "", path)
         if os.path.isdir(abspath):
             sort_by = request.args.get("sort_by", "name")
+            order = {"asc": 1, "desc": -1}[request.args.get("order", "asc")]
             entries = Entry.browse(path, autoindex=self,
-                                   root=self.browse_root, sort_by=sort_by)
+                                   root=self.browse_root,
+                                   sort_by=sort_by,
+                                   order=order)
             titlepath = "/" + ("" if path == "." else path)
             prefix = self.template_prefix
-            options = dict(path=titlepath, entries=entries, sort_by=sort_by)
-            return render_template("{0}browse.html".format(prefix), **options)
+            values = dict(path=titlepath, entries=entries,
+                          sort_by=sort_by, order=order)
+            return render_template("{0}browse.html".format(prefix), **values)
         elif os.path.isfile(abspath):
             return send_file(abspath)
         else:
