@@ -123,12 +123,3 @@ Models
 .. autoclass:: Entry
    :members:
 
-.. autoclass:: File
-   :members:
-
-.. autoclass:: Forder
-   :members:
-
-.. autoclass:: ParentFolder
-   :members:
-

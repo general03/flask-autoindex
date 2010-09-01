@@ -52,6 +52,7 @@ class Entry(object):
 
     @classmethod
     def add_icon_rule(cls, icon, rule):
+        """Adds a new icon rule globally."""
         cls.icon_map.append((icon, rule))
 
     @classmethod
@@ -59,6 +60,7 @@ class Entry(object):
         cls.add_icon_rule(icon, lambda ent: ent.name == name)
 
     def guess_icon(self):
+        """Guesses an icon from itself."""
         try:
             if self.autoindex:
                 icon_map = self.autoindex.icon_map + self.icon_map

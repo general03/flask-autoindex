@@ -12,21 +12,27 @@ __name__ = "__autoindex__"
 
 
 class AutoIndex(object):
-    """This class makes the Flask application or module to serve automacally
-    generated index page. The wrapped site(application or module) will route
-    ``/`` and ``/<path:path>``.
+    """This class makes the Flask application to serve automatically
+    generated index page. The wrapped application will route ``/`` and
+    ``/<path:path>``.
+
+    :param base: a flask application
+    :param browse_root: a path which is served by root address.
 
     You can make your application to serve generated index::
 
         app = Flask(__name__)
         idx = AutoIndex(app, "/home/someone/public_html")
-        assert isinstance(idx, AutoIndexApplication)
 
-    Or with module::
+    ..
+        TODO: add 'or module' after '... the Flask application' in first
+              paragraph.
 
-        mod = Module(__name__, subdomain="mod")
-        idx = AutoIndex(mod, "/home/otherone/public_html")
-        assert isinstance(idx, AutoIndexModule)
+        Or with module::
+
+            mod = Module(__name__, subdomain="mod")
+            idx = AutoIndex(mod, "/home/otherone/public_html")
+            assert isinstance(idx, AutoIndexModule)
     """
 
     icon_map = []
@@ -49,9 +55,7 @@ class AutoIndex(object):
             raise TypeError("'base' should be Flask or Module.")
 
     def __init__(self, base, browse_root=None):
-        """Initializes an autoindex instance. And overrides ``jinja_loader``
-        of the wrapped application or module to :meth:`AutoIndex.jinja_loader`.
-        """
+        """Initializes an autoindex instance."""
         self.base, self.browse_root = base, browse_root
         self.base.jinja_loader = self.jinja_loader
         for rule in "/", "/<path:path>":
@@ -80,6 +84,46 @@ class AutoIndex(object):
 
     def add_icon_rule(self, icon, rule=None, ext=None, mimetype=None,
                       name=None, filename=None, foldername=None):
+        """Adds a new icon rule.
+        
+        There is many shortcuts for rule. You can use one or more shortcuts in
+        a rule.
+
+        `rule`
+            A function which returns ``True`` or ``False``. It has one argument
+            which is an instance of :class:`Entry`. Here is an example::
+
+                def has_long_name(ent):
+                    return len(ent.name) > 10
+                idx.add_icon_rule("brick.png", rule=has_log_name)
+
+            Now the application represents files or folders such as
+            ``very-very-long-name.js`` with ``brick.png`` icon.
+
+        `ext`
+            A file extension or file extensions to match a file::
+
+                idx.add_icon_rule("ruby.png", ext="ruby")
+                idx.add_icon_rule("bug.png", ext=["bug", "insect"])
+
+        `mimetype`
+            A mimetype or mimetypes to match a file::
+
+                idx.add_icon_rule("application.png", mimetype="application/*")
+                idx.add_icon_rule("world.png", mimetype=["image/icon", "x/*"])
+
+        `name`
+            A name or names to match a file or folder::
+
+                idx.add_icon_rule("error.png", name="error")
+                idx.add_icon_rule("database.png", name=["mysql", "sqlite"])
+
+        `filename`
+            Same as `name`, but it matches only a file.
+
+        `foldername`
+            Same as `name`, but it matches only a folder.
+        """
         if name:
             filename = name
             foldername = name
@@ -93,10 +137,6 @@ class AutoIndex(object):
             Folder.add_icon_rule_by_name.im_func(self, icon, foldername)
         if callable(rule):
             Entry.add_icon_rule.im_func(self, icon, rule)
-
-    @property
-    def template_prefix(self):
-        raise NotImplementedError()
 
     def send_static_file(self, filename):
         """Serves a static file. It finds the file from autoindex internal
@@ -112,10 +152,16 @@ class AutoIndex(object):
 
     @cached_property
     def jinja_loader(self):
-        """The jinja loader with merged template paths."""
+        """The jinja loader with merged template paths. The wrapped
+        application's ``jinja_loader`` will be overridden with this.
+        """
         paths = [os.path.join(path, "templates") \
                  for path in __dir__, self.base.root_path]
         return FileSystemLoader(paths)
+
+    @property
+    def template_prefix(self):
+        raise NotImplementedError()
 
 
 class AutoIndexApplication(AutoIndex):
