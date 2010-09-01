@@ -1,60 +1,110 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
 body, table {
-    font-family: sans-serif;
-    font-size: 14px;
+  font-family: sans-serif;
+  font-size: 14px;
 }
 
 a:link, a:visited {
-    text-decoration: none;
+  text-decoration: none;
 }
 a:link {
-    color: #36c;
+  color: #36c;
 }
 a:visited {
-    color: #333;
+  color: #333;
 }
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
+.path {
+  padding: 0;
+}
 h1 {
-    font-size: 20px;
-    color: #234;
+  font-size: 12px;
+  color: #666;
+  padding: 5px;
+  background: #f4f4f4;
+  border-top: 1px solid #ccc;
 }
 
 table {
-    border-collapse: collapse;
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+}
+thead {
+  border-bottom: 1px solid #ccc;
 }
 th {
-    font-size: 11px;
+  font-size: 11px;
+  height: 30px;
+  background: #ddd;
+  background: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0, #ddd),
+    color-stop(1, #eee)
+  );
+  background: -moz-linear-gradient(
+    center bottom,
+    #ddd 0%,
+    #eee 100%
+  );
 }
 th a:link, th a:visited {
-    margin: 0 10px;
-    color: #333;
+  margin: 0 10px;
+  color: #333;
+}
+th img {
+  position: absolute;
+  margin-left: -6px;
 }
 tbody {
-    border: solid #ccc;
-    border-width: 1px 0;
+  border: solid #ccc;
+  border-width: 1px 0;
 }
 hr {
-    margin: 0;
-    border: none;
+  margin: 0;
+  border: none;
 }
 td {
-    padding: 5px;
-    font-size: 11px;
-    color: #333;
+  padding: 5px;
+  font-size: 11px;
+  color: #333;
+  border-left: 1px dashed #eee;
 }
 td a {
-    margin-right: 40px;
-    font-size: 14px;
+  margin-right: 40px;
+  font-size: 14px;
 }
 td.modified, td.size {
-    text-align: right;
+  text-align: right;
+}
+.icon, .name {
+  border: none;
+}
+.icon {
+  width: 16px;
+  padding-right: 0;
+}
+.modified {
+  width: 120px;
+}
+.size {
+  width: 60px;
 }
 
 address {
-    padding-top: 5px;
-    font-size: 11px;
-    color: #333;
+  padding: 5px;
+  font-size: 11px;
+  color: #333;
+  text-align: right;
 }
 

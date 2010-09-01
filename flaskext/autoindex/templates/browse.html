@@ -1,18 +1,22 @@
-{% from "__autoindex__/entry.html" import entry, thead %}
+{% from "__autoindex__/entry.html" import entry, thead with context %}
 
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>{% block title %}{% endblock %}</title>
+  <title>Index of {{ path|e }}</title>
   <link rel="stylesheet" type="text/css"
     href="{{ url_for("static", filename="style.css")|e }}" />
 </head>
 <body>
-  <h1>Index of {{ path }}</h1>
   <table>
     <thead>
       {{ thead() }}
+      {% if path != "/" %}
+        <tr>
+          <td class="path" colspan="4"><h1>{{ path|e }}</h1></td>
+        </tr>
+      {% endif %}
     </thead>
     <tbody>
       {% for ent in entries %}

@@ -24,11 +24,28 @@
   </tr>
 {% endmacro %}
 
+{% macro th(key, label, colspan=1) %}
+  <th class="{{ key|e }}" colspan="{{ colspan|e }}">
+    {%- if sort_by == key and order > 0 -%}
+      <a href="?sort_by={{ key|e }}&order=desc">{{ label|e }}</a>
+    {%- else -%}
+      <a href="?sort_by={{ key|e }}">{{ label|e }}</a>
+    {%- endif -%}
+    {%- if sort_by == key -%}
+      {%- if order > 0 -%}
+        <img src="{{ url_for("static", filename="asc.gif")|e }}" alt="ASC" />
+      {%- elif order < 0 -%}
+        <img src="{{ url_for("static", filename="desc.gif")|e }}" alt="DESC" />
+      {%- endif -%}
+    {%- endif -%}
+  </th>
+{% endmacro %}
+
 {% macro thead() %}
   <tr>
-    <th class="name" colspan="2"><a href="?sort_by=name">Name</a></th>
-    <th class="modified"><a href="?sort_by=modified">Last modified</a></th>
-    <th class="size"><a href="?sort_by=size">Size</a></th>
+    {{ th("name", "Name", 2) }}
+    {{ th("modified", "Last modified") }}
+    {{ th("size", "Size") }}
   </tr>
 {% endmacro %}
 
