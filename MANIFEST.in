@@ -1,3 +1,2 @@
 recursive-include flaskext/autoindex/static *
-recursive-include flaskext/autoindex/static/icons *
 recursive-include flaskext/autoindex/templates *
