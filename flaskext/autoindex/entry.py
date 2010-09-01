@@ -23,10 +23,10 @@ class Entry(object):
 
     def __new__(cls, path, root=None, autoindex=None):
         """Returns a file or folder instance."""
-        abspath = os.path.join(root, path)
         if cls is not Entry:
             return object.__new__(cls)
-        elif os.path.isdir(abspath):
+        abspath = os.path.join(root, path)
+        if os.path.isdir(abspath):
             return Folder(path, root)
         elif os.path.isfile(abspath):
             return File(path, root)
@@ -76,33 +76,6 @@ class Entry(object):
         except AttributeError:
             raise GuessError("There is no matched icon.")
 
-    @classmethod
-    def browse(cls, path, root=None, autoindex=None,
-               sort_by="name", order=1, show_hidden=False):
-        def compare(ent1, ent2):
-            def asc():
-                if sort_by != "modified" and type(ent1) is not type(ent2):
-                    return 1 if type(ent1) is File else -1
-                else:
-                    try:
-                        return cmp(getattr(ent1, sort_by),
-                                   getattr(ent2, sort_by))
-                    except AttributeError:
-                        return cmp(getattr(ent1, "name"),
-                                   getattr(ent2, "name"))
-                    #return -order
-            return asc() * order
-        abspath = os.path.join(root, path)
-        if not os.path.samefile(abspath, root):
-            yield ParentFolder(path, root=root)
-        entries = os.listdir(abspath)
-        entries = (cls(os.path.join(path, name), root, autoindex) \
-                   for name in entries)
-        entries = sorted(entries, cmp=compare)
-        for ent in entries:
-            if show_hidden or not ent.hidden:
-                yield ent
-
 
 class File(Entry):
 
@@ -134,14 +107,40 @@ class Folder(Entry):
     default_icon = "folder.png"
     icon_map = []
 
+    def browse(self, sort_by="name", order=1, show_hidden=False):
+        def compare(ent1, ent2):
+            def asc():
+                if sort_by != "modified" and type(ent1) is not type(ent2):
+                    return 1 if type(ent1) is File else -1
+                else:
+                    try:
+                        return cmp(getattr(ent1, sort_by),
+                                   getattr(ent2, sort_by))
+                    except AttributeError:
+                        return cmp(getattr(ent1, "name"),
+                                   getattr(ent2, "name"))
+                    #return -order
+            return asc() * order
+        if not os.path.samefile(self.abspath, self.root):
+            yield ParentFolder(self)
+        entries = os.listdir(self.abspath)
+        entries = (Entry(os.path.join(self.path, name),
+                         self.root, self.autoindex) for name in entries)
+        entries = sorted(entries, cmp=compare)
+        for ent in entries:
+            if show_hidden or not ent.hidden:
+                yield ent
+
 
 class ParentFolder(Folder):
 
     default_icon = "arrow_turn_up.png"
     icon_map = []
 
-    def __init__(self, path, root=None):
-        super(ParentFolder, self).__init__(os.path.join(path, ".."), root)
+    def __init__(self, child_folder):
+        path = os.path.join(child_folder.path, "..")
+        super(ParentFolder, self).__init__(path, child_folder.root,
+                                                 child_folder.autoindex)
 
 
 class GuessError(RuntimeError): pass
