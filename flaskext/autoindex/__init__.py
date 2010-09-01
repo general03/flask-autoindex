@@ -1,13 +1,13 @@
 import os.path
 import re
-from flask import *
 from werkzeug import cached_property
 from jinja2 import FileSystemLoader
+from flask import *
+from flaskext.silk import Silk
 from .entry import *
 from . import icons
 
 
-__dir__ = os.path.abspath(os.path.dirname(__file__))
 __name__ = "__autoindex__"
 
 
@@ -57,6 +57,7 @@ class AutoIndex(object):
     def __init__(self, base, browse_root=None):
         """Initializes an autoindex instance."""
         self.base, self.browse_root = base, browse_root
+        self.silk = Silk(self.base)
         self.base.jinja_loader = self.jinja_loader
         for rule in "/", "/<path:path>":
             self.browse = self.base.route(rule)(self.browse)
@@ -141,7 +142,7 @@ class AutoIndex(object):
         static directory first. If it failed to find the file, it finds from
         the wrapped application or module's static directory.
         """
-        global_static = os.path.join(__dir__, "static")
+        global_static = os.path.join(os.path.dirname(__file__), "static")
         if os.path.isfile(os.path.join(global_static, filename)):
             static = global_static
         else:
@@ -154,7 +155,7 @@ class AutoIndex(object):
         application's ``jinja_loader`` will be overridden with this.
         """
         paths = [os.path.join(path, "templates") \
-                 for path in __dir__, self.base.root_path]
+                 for path in os.path.dirname(__file__), self.base.root_path]
         return FileSystemLoader(paths)
 
     @property

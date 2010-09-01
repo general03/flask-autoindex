@@ -18,7 +18,6 @@ class Entry(object):
         assert isinstance(file, File)
     """
 
-    ICONS_DIRNAME = "icons"
     HIDDEN = re.compile("^\.")
 
     def __new__(cls, path, root=None, autoindex=None):
@@ -68,11 +67,11 @@ class Entry(object):
                 icon_map = self.icon_map
             for icon, rule in icon_map:
                 if rule(self):
-                    return os.path.join(self.ICONS_DIRNAME, icon)
+                    return icon
         except AttributeError:
             pass
         try:
-            return os.path.join(self.ICONS_DIRNAME, self.default_icon)
+            return self.default_icon
         except AttributeError:
             raise GuessError("There is no matched icon.")
 
