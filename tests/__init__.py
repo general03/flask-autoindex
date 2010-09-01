@@ -22,7 +22,7 @@ class ApplicationTestCase(unittest.TestCase):
         assert 200 == rv.status_code, "could not found preloaded css file."
 
     def test_icon(self):
-        rv = self.get("/static/icons/page_white.png")
+        rv = self.get("/icons/page_white.png")
         assert 294 == len(rv.data), "could not found preloaded icon file."
 
     def test_browse(self):
@@ -62,7 +62,7 @@ class SubdomainTestCase(unittest.TestCase):
         assert 200 == rv.status_code, "could not found preloaded css file."
 
     def test_icon(self):
-        rv = self.get("/static/icons/page_white.png")
+        rv = self.get("/icons/page_white.png")
         assert 294 == len(rv.data), "could not found preloaded icon file."
 
     def test_browse(self):
@@ -92,7 +92,7 @@ class WithoutSubdomainTestCase(unittest.TestCase):
         assert 200 == rv.status_code, "could not found preloaded css file."
 
     def test_icon(self):
-        rv = self.get("/static/icons/page_white.png")
+        rv = self.get("/icons/page_white.png")
         assert 294 == len(rv.data), "could not found preloaded icon file."
 
     def test_browse(self):
