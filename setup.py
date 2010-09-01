@@ -33,6 +33,7 @@ setup(
     description="Generates index page like mod_autoindex",
     long_description=__doc__,
     packages=["flaskext", "flaskext.autoindex"],
+    include_package_data=True,
     package_data={"flaskext.autoindex": ["static/icons/*",
                                          "static/style.css",
                                          "templates/*"]},
