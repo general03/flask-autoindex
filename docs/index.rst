@@ -20,7 +20,15 @@ style, but you can make your own style.
 Installation
 ============
 
-Flask-AutoIndex is only available on GitHub now. Check out right now::
+Install Flask-AutoIndex with ``easy_install`` or ``pip`` command::
+
+    $ easy_install Flask-AutoIndex
+ 
+::
+
+    $ pip install Flask-AutoIndex
+
+or check out development version::
 
     $ git clone git://github.com/sublee/flask-autoindex.git
 
