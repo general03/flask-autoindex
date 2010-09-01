@@ -4,7 +4,7 @@ Flask-AutoIndex
 .. module:: flaskext.autoindex
 
 Flask-AutoIndex generates an index page to our `Flask`_ application
-automacally. The result just like `mod_autoindex`_, but the look is more
+automatically. The result just like `mod_autoindex`_, but the look is more
 awesome! Look at this:
 
 .. figure:: _static/example.png
