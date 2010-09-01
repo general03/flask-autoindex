@@ -123,3 +123,10 @@ Models
 .. autoclass:: Entry
    :members:
 
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
