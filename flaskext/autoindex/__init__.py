@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+    flaskext.autoindex
+    ~~~~~~~~~~~~~~~~~~
+
+    A mod_autoindex for `Flask <http://flask.pocoo.org/>`_.
+
+    :copyright: (c) 2010 by Lee Heung-sub.
+    :license: BSD, see LICENSE for more details.
+"""
 import os.path
 import re
 from werkzeug import cached_property

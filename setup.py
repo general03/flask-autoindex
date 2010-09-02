@@ -35,7 +35,7 @@ setup(
     license="BSD",
     author="Lee Heung-sub",
     author_email="heung@sublee.kr",
-    description="Generates index page like mod_autoindex for Flask application",
+    description="A mod_autoindex for Flask",
     long_description=__doc__,
     packages=["flaskext", "flaskext.autoindex"],
     include_package_data=True,
