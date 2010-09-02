@@ -18,7 +18,7 @@ from .entry import *
 from . import icons
 
 
-__name__ = "__autoindex__"
+__autoindex__ = "__autoindex__"
 
 
 class AutoIndex(object):
@@ -50,11 +50,12 @@ class AutoIndex(object):
     def _register_shared_autoindex(self, state=None, app=None):
         """Registers a magic module named __autoindex__."""
         app = app or state.app
-        if __name__ not in app.modules:
-            app.modules[__name__] = self.base
+        if __autoindex__ not in app.modules:
+            shared_mod = Module(__name__)
+            AutoIndex(shared_mod)
+            app.modules[__autoindex__] = shared_mod
 
     def __new__(cls, base, browse_root=None):
-        """Checks a base."""
         if cls is not AutoIndex:
             return object.__new__(cls)
         elif isinstance(base, Flask):
@@ -165,7 +166,7 @@ class AutoIndex(object):
         application's ``jinja_loader`` will be overridden with this.
         """
         paths = [os.path.join(path, "templates") \
-                 for path in os.path.dirname(__file__), self.base.root_path]
+                 for path in self.base.root_path, os.path.dirname(__file__)]
         return FileSystemLoader(paths)
 
     @property

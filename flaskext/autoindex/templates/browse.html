@@ -7,26 +7,32 @@
   <title>Index of {{ path|e }}</title>
   <link rel="stylesheet" type="text/css"
     href="{{ url_for("static", filename="style.css")|e }}" />
+  {% block meta %}{% endblock %}
 </head>
 <body>
-  <table>
-    <thead>
-      {{ thead() }}
-      {% if path != "/" %}
-        <tr>
-          <td class="path" colspan="4"><h1>{{ path|e }}</h1></td>
-        </tr>
-      {% endif %}
-    </thead>
-    <tbody>
-      {% for ent in entries %}
-        {{ entry(ent) }}
-      {% endfor %}
-    </tbody>
-  </table>
-  {% set env = request.environ %}
-  <address>{{ env.SERVER_SOFTWARE|e }}
-    Server at {{ env.HTTP_HOST|e }}
-    Port {{ env.SERVER_PORT|e }}</address>
+  {% block header %}{% endblock %}
+  {% block table %}
+    <table>
+      <thead>
+        {{ thead() }}
+        {% if path != "/" %}
+          <tr>
+            <td class="path" colspan="4"><h1>{{ path|e }}</h1></td>
+          </tr>
+        {% endif %}
+      </thead>
+      <tbody>
+        {% for ent in entries %}
+          {{ entry(ent) }}
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endblock %}
+  {% block footer %}
+    {% set env = request.environ %}
+    <address>{{ env.SERVER_SOFTWARE|e }}
+      Server at {{ env.HTTP_HOST|e }}
+      Port {{ env.SERVER_PORT|e }}</address>
+  {% endblock %}
 </body>
 </html>
