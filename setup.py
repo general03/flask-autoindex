@@ -44,7 +44,7 @@ setup(
     zip_safe=False,
     platforms="any",
     install_requires=[
-        "Flask",
+        "Flask>=0.6",
         "flask-silk"
     ],
     test_suite="__main__.run_tests",
