@@ -45,7 +45,7 @@ setup(
     platforms="any",
     install_requires=[
         "Flask>=0.6",
-        "flask-silk"
+        "Flask-Silk"
     ],
     test_suite="__main__.run_tests",
     classifiers=[
