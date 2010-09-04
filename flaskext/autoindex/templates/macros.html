@@ -3,7 +3,7 @@
     {% set icon = ent.guess_icon() %}
     <td class="icon">
       {% if icon %}
-        <img src="{{ url_for("silkicon", filename=icon)|e }}" />
+        <img src="{{ icon|e }}" />
       {% endif %}
     </td>
     <td class="name"><a href="/{{ ent.path|e }}">
@@ -58,7 +58,7 @@
   <a href="{{ url_for("browse", path=ent.path)|e }}">
     {% set icon = ent.guess_icon() %}
     {% if icon %}
-      <img src="{{ url_for("silkicon", filename=icon)|e }}" />
+      <img src="{{ icon|e }}" />
     {% endif %}
     {% if not ent.is_root() %}
       {{ ent.name|e }}

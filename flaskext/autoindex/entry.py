@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import os.path
 import re
+from urlparse import urljoin
 from datetime import datetime
 from mimetypes import guess_type
 from fnmatch import fnmatch
+from flask import url_for
 
 
 Default = None
@@ -60,7 +62,7 @@ class Entry(object):
         return datetime.fromtimestamp(os.path.getmtime(self.abspath))
 
     @classmethod
-    def add_icon_rule(cls, icon, rule):
+    def add_icon_rule(cls, icon, rule=None):
         """Adds a new icon rule globally."""
         cls.icon_map.append((icon, rule))
 
@@ -68,22 +70,32 @@ class Entry(object):
     def add_icon_rule_by_name(cls, icon, name):
         cls.add_icon_rule(icon, lambda ent: ent.name == name)
 
+    @classmethod
+    def add_icon_rule_by_class(cls, icon, _class):
+        cls.add_icon_rule(icon, lambda ent: isinstance(ent, _class))
+
     def guess_icon(self):
         """Guesses an icon from itself."""
-        try:
-            if self.autoindex:
-                icon_map = self.autoindex.icon_map + self.icon_map
-            else:
-                icon_map = self.icon_map
-            for icon, rule in icon_map:
-                if rule(self):
-                    return icon
-        except AttributeError:
-            pass
-        try:
-            return self.default_icon
-        except AttributeError:
-            raise GuessError("There is no matched icon.")
+        def get_icon_url():
+            try:
+                if self.autoindex:
+                    icon_map = self.autoindex.icon_map + self.icon_map
+                else:
+                    icon_map = self.icon_map
+                for icon, rule in icon_map:
+                    if not rule and callable(icon):
+                        matched = icon = icon(self)
+                    else:
+                        matched = rule(self)
+                    if matched:
+                        return icon
+            except AttributeError:
+                pass
+            try:
+                return self.default_icon
+            except AttributeError:
+                raise GuessError("There is no matched icon.")
+        return urljoin(url_for("silkicon", filename=""), get_icon_url())
 
 
 class File(Entry):

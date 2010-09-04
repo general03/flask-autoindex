@@ -95,7 +95,7 @@ td a {
   margin-right: 40px;
   font-size: 14px;
 }
-td.modified, td.size {
+td.size {
   text-align: right;
 }
 .icon, .name {
@@ -106,7 +106,7 @@ td.modified, td.size {
   padding-right: 0;
 }
 .modified {
-  width: 120px;
+  width: 105px;
 }
 .size {
   width: 60px;

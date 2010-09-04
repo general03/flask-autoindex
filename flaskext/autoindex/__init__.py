@@ -93,7 +93,7 @@ class AutoIndex(object):
             return abort(404)
 
     def add_icon_rule(self, icon, rule=None, ext=None, mimetype=None,
-                      name=None, filename=None, foldername=None):
+                      name=None, filename=None, foldername=None, cls=None):
         """Adds a new icon rule.
         
         There is many shortcuts for rule. You can use one or more shortcuts in
@@ -111,19 +111,19 @@ class AutoIndex(object):
             ``very-very-long-name.js`` with ``brick.png`` icon.
 
         `ext`
-            A file extension or file extensions to match a file::
+            A file extension or file extensions to match with a file::
 
                 idx.add_icon_rule("ruby.png", ext="ruby")
                 idx.add_icon_rule("bug.png", ext=["bug", "insect"])
 
         `mimetype`
-            A mimetype or mimetypes to match a file::
+            A mimetype or mimetypes to match with a file::
 
                 idx.add_icon_rule("application.png", mimetype="application/*")
                 idx.add_icon_rule("world.png", mimetype=["image/icon", "x/*"])
 
         `name`
-            A name or names to match a file or folder::
+            A name or names to match with a file or folder::
 
                 idx.add_icon_rule("error.png", name="error")
                 idx.add_icon_rule("database.png", name=["mysql", "sqlite"])
@@ -145,7 +145,9 @@ class AutoIndex(object):
             File.add_icon_rule_by_name.im_func(self, icon, filename)
         if foldername:
             Folder.add_icon_rule_by_name.im_func(self, icon, foldername)
-        if callable(rule):
+        if cls:
+            Entry.add_icon_rule_by_class.im_func(self, icon, cls)
+        if callable(rule) or callable(icon):
             Entry.add_icon_rule.im_func(self, icon, rule)
 
     def send_static_file(self, filename):
