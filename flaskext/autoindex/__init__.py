@@ -80,11 +80,11 @@ class AutoIndex(object):
         if os.path.isdir(abspath):
             sort_by = request.args.get("sort_by", "name")
             order = {"asc": 1, "desc": -1}[request.args.get("order", "asc")]
-            cursor = Folder(path, self.browse_root, self)
+            curdir = Folder(path, self.browse_root, self)
             titlepath = "/" + ("" if path == "." else path)
             prefix = self.template_prefix
-            entries = cursor.browse(sort_by=sort_by, order=order)
-            values = dict(path=titlepath, entries=entries,
+            entries = curdir.browse(sort_by=sort_by, order=order)
+            values = dict(curdir=curdir, path=titlepath, entries=entries,
                           sort_by=sort_by, order=order)
             return render_template("{0}browse.html".format(prefix), **values)
         elif os.path.isfile(abspath):

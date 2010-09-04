@@ -22,12 +22,23 @@ a:hover {
   text-decoration: underline;
 }
 
-.path {
+.breadcrumb {
   padding: 0;
 }
-h1 {
-  font-size: 12px;
+.breadcrumb a {
+  margin: 0;
   color: #666;
+  font-size: 12px;
+}
+.breadcrumb .sep {
+  color: #bbb;
+}
+.breadcrumb img {
+  vertical-align: middle;
+}
+.breadcrumb h1 {
+  font-size: 12px;
+  font-weight: normal;
   padding: 5px;
   background: #f4f4f4;
   border-top: 1px solid #ccc;

@@ -46,6 +46,15 @@ class Entry(object):
         self.autoindex = autoindex
 
     @property
+    def parent(self):
+        if self.is_root():
+            return None
+        return Entry(os.path.dirname(self.path), self.root, self.autoindex)
+
+    def is_root(self):
+        return os.path.samefile(self.abspath, self.root)
+
+    @property
     def modified(self):
         """Returns modified time of this."""
         return datetime.fromtimestamp(os.path.getmtime(self.abspath))
@@ -107,6 +116,13 @@ class Folder(Entry):
     default_icon = "folder.png"
     icon_map = []
 
+    def __new__(cls, path, root=None, autoindex=None):
+        if cls is not Folder:
+            return object.__new__(cls)
+        elif root and os.path.samefile(os.path.join(root, path), root):
+            return RootFolder(path, root, autoindex)
+        return object.__new__(cls)
+
     def browse(self, sort_by="name", order=1, show_hidden=False):
         def compare(ent1, ent2):
             def asc():
@@ -121,7 +137,7 @@ class Folder(Entry):
                                    getattr(ent2, "name"))
                     #return -order
             return asc() * order
-        if not os.path.samefile(self.abspath, self.root):
+        if not self.is_root():
             yield ParentFolder(self)
         entries = os.listdir(self.abspath)
         entries = (Entry(os.path.join(self.path, name),
@@ -141,6 +157,15 @@ class ParentFolder(Folder):
         path = os.path.join(child_folder.path, "..")
         super(ParentFolder, self).__init__(path, child_folder.root,
                                                  child_folder.autoindex)
+
+
+class RootFolder(Folder):
+
+    default_icon = "server.png"
+    icon_map = []
+
+    def __init__(self, path, root, autoindex=None):
+        super(RootFolder, self).__init__(".", root, autoindex)
 
 
 class GuessError(RuntimeError): pass

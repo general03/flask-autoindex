@@ -49,3 +49,20 @@
   </tr>
 {% endmacro %}
 
+{% macro breadcrumb(ent) %}
+  {% set parent = ent.parent %}
+  {% if parent %}
+    {{ breadcrumb(parent) }}
+    <span class="sep">&raquo;</span>
+  {% endif %}
+  <a href="{{ url_for("browse", path=ent.path)|e }}">
+    {% set icon = ent.guess_icon() %}
+    {% if icon %}
+      <img src="{{ url_for("silkicon", filename=icon)|e }}" />
+    {% endif %}
+    {% if not ent.is_root() %}
+      {{ ent.name|e }}
+    {% endif %}
+  </a>
+{% endmacro %}
+

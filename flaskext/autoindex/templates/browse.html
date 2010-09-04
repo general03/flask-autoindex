@@ -1,13 +1,15 @@
-{% from "__autoindex__/entry.html" import entry, thead with context %}
+{% from "__autoindex__/macros.html" import entry, thead, breadcrumb
+   with context %}
 
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
   <title>Index of {{ path|e }}</title>
-  <link rel="stylesheet" type="text/css"
-    href="{{ url_for("static", filename="autoindex.css")|e }}" />
-  {% block meta %}{% endblock %}
+  {% block meta %}
+    <link rel="stylesheet" type="text/css"
+      href="{{ url_for("static", filename="autoindex.css")|e }}" />
+  {% endblock %}
 </head>
 <body>
   {% block header %}{% endblock %}
@@ -17,7 +19,9 @@
         {{ thead() }}
         {% if path != "/" %}
           <tr>
-            <td class="path" colspan="4"><h1>{{ path|e }}</h1></td>
+            <td class="breadcrumb" colspan="4">
+              <h1>{{ breadcrumb(curdir)|e }}</h1>
+            </td>
           </tr>
         {% endif %}
       </thead>
