@@ -5,10 +5,10 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Index of {{ path|e }}</title>
+  <title>Index of {{ path }}</title>
   {% block meta %}
     <link rel="stylesheet" type="text/css"
-      href="{{ url_for("static", filename="autoindex.css")|e }}" />
+      href="{{ url_for("static", filename="autoindex.css") }}" />
   {% endblock %}
 </head>
 <body>
@@ -20,7 +20,7 @@
         {% if path != "/" %}
           <tr>
             <td class="breadcrumb" colspan="4">
-              <h1>{{ breadcrumb(curdir)|e }}</h1>
+              <h1>{{ breadcrumb(curdir) }}</h1>
             </td>
           </tr>
         {% endif %}
@@ -32,11 +32,18 @@
       </tbody>
     </table>
   {% endblock %}
+  {% block readme %}
+    {% if readme %}
+      <div id="readme">
+        {{ readme.to_html()|safe }}
+      </div>
+    {% endif %}
+  {% endblock %}
   {% block footer %}
     {% set env = request.environ %}
-    <address>{{ env.SERVER_SOFTWARE|e }}
-      Server at {{ env.HTTP_HOST|e }}
-      Port {{ env.SERVER_PORT|e }}</address>
+    <address>{{ env.SERVER_SOFTWARE }}
+      Server at {{ env.HTTP_HOST }}
+      Port {{ env.SERVER_PORT }}</address>
   {% endblock %}
 </body>
 </html>

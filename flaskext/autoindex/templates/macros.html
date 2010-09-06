@@ -3,17 +3,19 @@
     {% set icon = ent.guess_icon() %}
     <td class="icon">
       {% if icon %}
-        <img src="{{ icon|e }}" />
+        <img src="{{ icon }}" />
       {% endif %}
     </td>
-    <td class="name"><a href="/{{ ent.path|e }}">
+    <td class="name"><a href="/{{ ent.path }}">
       {%- if ent.name == ".." -%}
         Parent folder
       {%- else -%}
-        {{ ent.name|e }}
+        {{ ent.name }}
       {%- endif -%}
     </a></td>
-    <td class="modified">{{ ent.modified }}</td>
+    <td class="modified">
+      <time datetime="{{ ent.modified }}">{{ ent.modified }}</time>
+    </td>
     <td class="size">
       {% if ent.size %}
         {{ ent.size|filesizeformat }}
@@ -25,17 +27,17 @@
 {% endmacro %}
 
 {% macro th(key, label, colspan=1) %}
-  <th class="{{ key|e }}" colspan="{{ colspan|e }}">
+  <th class="{{ key }}" colspan="{{ colspan }}">
     {%- if sort_by == key and order > 0 -%}
-      <a href="?sort_by={{ key|e }}&order=desc">{{ label|e }}</a>
+      <a href="?sort_by={{ key }}&order=desc">{{ label }}</a>
     {%- else -%}
-      <a href="?sort_by={{ key|e }}">{{ label|e }}</a>
+      <a href="?sort_by={{ key }}">{{ label }}</a>
     {%- endif -%}
     {%- if sort_by == key -%}
       {%- if order > 0 -%}
-        <img src="{{ url_for("static", filename="asc.gif")|e }}" alt="ASC" />
+        <img src="{{ url_for("static", filename="asc.gif") }}" alt="ASC" />
       {%- elif order < 0 -%}
-        <img src="{{ url_for("static", filename="desc.gif")|e }}" alt="DESC" />
+        <img src="{{ url_for("static", filename="desc.gif") }}" alt="DESC" />
       {%- endif -%}
     {%- endif -%}
   </th>
@@ -55,13 +57,13 @@
     {{ breadcrumb(parent) }}
     <span class="sep">&raquo;</span>
   {% endif %}
-  <a href="{{ url_for("browse", path=ent.path)|e }}">
+  <a href="{{ url_for("browse", path=ent.path) }}">
     {% set icon = ent.guess_icon() %}
     {% if icon %}
-      <img src="{{ icon|e }}" />
+      <img src="{{ icon }}" />
     {% endif %}
     {% if not ent.is_root() %}
-      {{ ent.name|e }}
+      {{ ent.name }}
     {% endif %}
   </a>
 {% endmacro %}
