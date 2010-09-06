@@ -84,8 +84,12 @@ class AutoIndex(object):
             titlepath = "/" + ("" if path == "." else path)
             prefix = self.template_prefix
             entries = curdir.browse(sort_by=sort_by, order=order)
+            try:
+                readme = curdir.get_readme()
+            except IOError:
+                readme = None
             values = dict(curdir=curdir, path=titlepath, entries=entries,
-                          sort_by=sort_by, order=order)
+                          sort_by=sort_by, order=order, readme=readme)
             return render_template("{0}browse.html".format(prefix), **values)
         elif os.path.isfile(abspath):
             return send_file(abspath)

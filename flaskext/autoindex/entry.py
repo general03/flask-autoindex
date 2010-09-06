@@ -5,6 +5,7 @@ from urlparse import urljoin
 from datetime import datetime
 from mimetypes import guess_type
 from fnmatch import fnmatch
+from werkzeug import cached_property
 from flask import url_for
 
 
@@ -113,6 +114,28 @@ class File(Entry):
         except AttributeError:
             self.ext = None
 
+    def to_html(self):
+        text = "".join(self.readlines())
+        text = text.decode("utf-8")
+        try:
+            if self.ext in ("markdown", "md"):
+                from markdown import Markdown
+                return Markdown().convert(text)
+        except ImportError:
+            pass
+        return "<pre>{0}</pre>".format(text)
+
+    def readlines(self):
+        return self.stream.readlines()
+
+    @cached_property
+    def stream(self):
+        return open(self.abspath)
+
+    @cached_property
+    def mimetype(self):
+        return guess_type(self.abspath)
+
     @classmethod
     def add_icon_rule_by_ext(cls, icon, ext):
         cls.add_icon_rule(icon, lambda ent: ent.ext == ext)
@@ -158,6 +181,16 @@ class Folder(Entry):
         for ent in entries:
             if show_hidden or not ent.hidden:
                 yield ent
+
+    def get_readme(self, readme_filename="README"):
+        readmes = [p for p in os.listdir(self.abspath) \
+                   if p.startswith(readme_filename)]
+        if readmes:
+            return self.get_file(readmes[0])
+        raise IOError("{0} folder has no readme file.".format(self.name))
+
+    def get_file(self, filename):
+        return File(os.path.join(self.abspath, filename))
 
 
 class ParentFolder(Folder):

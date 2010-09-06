@@ -22,6 +22,54 @@ a:hover {
   text-decoration: underline;
 }
 
+#readme {
+  padding: 10px 26px;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+  color: #333;
+  background: #fafafa;
+}
+#readme pre {
+  line-height: 1.2;
+}
+#readme p, #readme ul, #readme ol,
+#readme h1, #readme h2, #readme h3, #readme h4, #readme h5, #readme h6 {
+  display: block;
+  margin-bottom: 1em;
+}
+#readme h1, #readme h2, #readme h3, #readme h4, #readme h5, #readme h6 {
+  padding: 0;
+  color: #456;
+  text-align: left;
+  font-family: sans-serif;
+  font-weight: bolder;
+}
+#readme pre code {
+  display: block;
+  padding: 9px;
+  margin: 0 -10px 1em;
+  border: 1px solid #cde;
+  color: #567;
+  background: #fff;
+}
+#readme li {
+  margin-left: 2em;
+}
+#readme blockquote {
+  padding: 9px;
+  margin: 0 -10px 1em;
+  border-left: 1px solid #cde;
+}
+#readme blockquote :last-child {
+  margin-bottom: 0;
+}
+#readme h1 { font-size: 1.5em; }
+#readme h2 { font-size: 1.4em; }
+#readme h3 { font-size: 1.3em; }
+#readme h4 { font-size: 1.2em; }
+#readme h5 { font-size: 1.1em; }
+#readme h6 { font-size: 1em; }
+
 .breadcrumb {
   padding: 0;
 }
@@ -94,6 +142,9 @@ td {
 td a {
   margin-right: 40px;
   font-size: 14px;
+}
+td.modified {
+  text-align: center;
 }
 td.size {
   text-align: right;
