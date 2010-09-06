@@ -18,7 +18,7 @@ class ApplicationTestCase(unittest.TestCase):
         return self.app.test_client().get(path)
 
     def test_css(self):
-        rv = self.get("/static/style.css")
+        rv = self.get("/static/autoindex.css")
         assert 200 == rv.status_code, "could not found preloaded css file."
 
     def test_icon(self):
@@ -58,7 +58,7 @@ class SubdomainTestCase(unittest.TestCase):
         return self.app.test_client().get(path, "http://test.example.org/")
 
     def test_css(self):
-        rv = self.get("/static/style.css")
+        rv = self.get("/static/autoindex.css")
         assert 200 == rv.status_code, "could not found preloaded css file."
 
     def test_icon(self):
@@ -88,7 +88,7 @@ class WithoutSubdomainTestCase(unittest.TestCase):
         return self.app.test_client().get(path)
 
     def test_css(self):
-        rv = self.get("/static/style.css")
+        rv = self.get("/static/autoindex.css")
         assert 200 == rv.status_code, "could not found preloaded css file."
 
     def test_icon(self):
