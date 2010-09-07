@@ -15,7 +15,7 @@ from jinja2 import FileSystemLoader
 from flask import *
 from flaskext.silk import Silk
 from .entry import *
-from . import icons
+from . import icons, converters
 
 
 __autoindex__ = "__autoindex__"
@@ -85,8 +85,8 @@ class AutoIndex(object):
             prefix = self.template_prefix
             entries = curdir.browse(sort_by=sort_by, order=order)
             try:
-                readme = curdir.get_readme()
-            except IOError:
+                readme = curdir.get_readme().to_html()
+            except (IOError, MarkupError):
                 readme = None
             values = dict(curdir=curdir, path=titlepath, entries=entries,
                           sort_by=sort_by, order=order, readme=readme)
@@ -153,6 +153,15 @@ class AutoIndex(object):
             Entry.add_icon_rule_by_class.im_func(self, icon, cls)
         if callable(rule) or callable(icon):
             Entry.add_icon_rule.im_func(self, icon, rule)
+
+    def add_html_converter(self, converter,
+                           rule=None, ext=None, mimetype=None):
+        if ext:
+            File.add_html_converter_by_ext(converter, ext)
+        if mimetype:
+            File.add_html_converter_by_mimetype(converter, mimetype)
+        if callable(rule):
+            File.add_html_converter(converter, rule)
 
     def send_static_file(self, filename):
         """Serves a static file. It finds the file from autoindex internal

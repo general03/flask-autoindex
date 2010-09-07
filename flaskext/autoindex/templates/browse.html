@@ -35,7 +35,7 @@
   {% block readme %}
     {% if readme %}
       <div id="readme">
-        {{ readme.to_html()|safe }}
+        {{ readme|safe }}
       </div>
     {% endif %}
   {% endblock %}

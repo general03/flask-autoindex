@@ -6,15 +6,19 @@ from datetime import datetime
 from mimetypes import guess_type
 from fnmatch import fnmatch
 from werkzeug import cached_property
-from flask import url_for
+from flask import url_for, send_file
 
 
 Default = None
 
 
+def _make_mimetype_matcher(mimetype):
+    return lambda ent: fnmatch(guess_type(ent.name)[0] or "", mimetype)
+
+
 class Entry(object):
     """This class wraps file or folder. It is an abstract class, but it returns
-    derived class. You can make an instance such as::
+    a derived instance. You can make an instance such as::
 
         folder = Entry("/home/someone/public_html")
         assert isinstance(foler, Folder)
@@ -54,9 +58,6 @@ class Entry(object):
             return None
         return Entry(os.path.dirname(self.path), self.root, self.autoindex)
 
-    def is_root(self):
-        return os.path.samefile(self.abspath, self.root)
-
     @property
     def modified(self):
         """Returns modified time of this."""
@@ -69,10 +70,12 @@ class Entry(object):
 
     @classmethod
     def add_icon_rule_by_name(cls, icon, name):
+        """Adds a new icon rule by the name globally."""
         cls.add_icon_rule(icon, lambda ent: ent.name == name)
 
     @classmethod
     def add_icon_rule_by_class(cls, icon, _class):
+        """Adds a new icon rule by the class globally."""
         cls.add_icon_rule(icon, lambda ent: isinstance(ent, _class))
 
     def guess_icon(self):
@@ -100,11 +103,13 @@ class Entry(object):
 
 
 class File(Entry):
+    """This class wraps a file."""
 
     EXTENSION = re.compile("\.(.+)$")
 
     default_icon = "page_white.png"
     icon_map = []
+    converter_map = []
 
     def __init__(self, path, root=None, autoindex=None):
         super(File, self).__init__(path, root, autoindex)
@@ -115,38 +120,59 @@ class File(Entry):
             self.ext = None
 
     def to_html(self):
-        text = "".join(self.readlines())
-        text = text.decode("utf-8")
+        """Converts to HTML format."""
+        text = self.data.decode("utf-8")
         try:
-            if self.ext in ("markdown", "md"):
-                from markdown import Markdown
-                return Markdown().convert(text)
-        except ImportError:
+            if self.autoindex:
+                converter_map = self.autoindex.converter_map + \
+                                self.converter_map
+            else:
+                converter_map = self.converter_map
+            for converter, rule in converter_map:
+                if rule(self):
+                    return converter(self)
+        except AttributeError:
             pass
-        return "<pre>{0}</pre>".format(text)
-
-    def readlines(self):
-        return self.stream.readlines()
+        raise MarkupError("It could not be converted to HTML.")
 
     @cached_property
-    def stream(self):
-        return open(self.abspath)
+    def data(self):
+        """Data of this file."""
+        return "".join(open(self.abspath).readlines())
 
     @cached_property
     def mimetype(self):
+        """A mimetype of this file."""
         return guess_type(self.abspath)
 
     @classmethod
     def add_icon_rule_by_ext(cls, icon, ext):
+        """Adds a new icon rule by the file extension globally."""
         cls.add_icon_rule(icon, lambda ent: ent.ext == ext)
 
     @classmethod
     def add_icon_rule_by_mimetype(cls, icon, mimetype):
-        rule = lambda ent: fnmatch(guess_type(ent.name)[0] or "", mimetype)
-        cls.add_icon_rule(icon, rule)
+        """Adds a new icon rule by the mimetype globally."""
+        cls.add_icon_rule(icon, _make_mimetype_matcher(mimetype))
+
+    @classmethod
+    def add_html_converter(cls, converter, rule):
+        """Adds a new html converter globally."""
+        cls.converter_map.append((converter, rule))
+
+    @classmethod
+    def add_html_converter_by_ext(cls, converter, ext):
+        """Adds a new html converter by the file extension globally."""
+        cls.add_html_converter(converter, lambda ent: ent.ext == ext)
+
+    @classmethod
+    def add_html_converter_by_mimetype(cls, converter, mimetype):
+        """Adds a new html converter by the mimetype globally."""
+        cls.add_html_converter(converter, _make_mimetype_matcher(mimetype))
 
 
 class Folder(Entry):
+    """This class wraps a folder."""
 
     default_icon = "folder.png"
     icon_map = []
@@ -158,7 +184,12 @@ class Folder(Entry):
             return RootFolder(path, root, autoindex)
         return object.__new__(cls)
 
+    def is_root(self):
+        """Returns ``True`` if it is a root folder."""
+        return os.path.samefile(self.abspath, self.root)
+
     def browse(self, sort_by="name", order=1, show_hidden=False):
+        """It is a generator. Each item is an child entry."""
         def compare(ent1, ent2):
             def asc():
                 if sort_by != "modified" and type(ent1) is not type(ent2):
@@ -170,10 +201,9 @@ class Folder(Entry):
                     except AttributeError:
                         return cmp(getattr(ent1, "name"),
                                    getattr(ent2, "name"))
-                    #return -order
             return asc() * order
         if not self.is_root():
-            yield ParentFolder(self)
+            yield _ParentFolder(self)
         entries = os.listdir(self.abspath)
         entries = (Entry(os.path.join(self.path, name),
                          self.root, self.autoindex) for name in entries)
@@ -182,29 +212,30 @@ class Folder(Entry):
             if show_hidden or not ent.hidden:
                 yield ent
 
-    def get_readme(self, readme_filename="README"):
-        readmes = [p for p in os.listdir(self.abspath) \
-                   if p.startswith(readme_filename)]
+    def get_readme(self, readme_filename="README",
+                   compare=lambda x, y: -cmp(len(x), len(y))):
+        """Returns a readme file. If this folder has many readme files, it
+        sorts them and returns the first readme file.
+        
+        :param readme_filename: a name of readme file. The default is
+                                ``README``.
+        :param compare: a function for sort readme files. when it is passed,
+                        this method returns a file which has a longest name.
+        """
+        readmes = sorted((p for p in os.listdir(self.abspath) \
+                          if p == readme_filename or \
+                             p.startswith(readme_filename + ".")), cmp=compare)
         if readmes:
             return self.get_file(readmes[0])
         raise IOError("{0} folder has no readme file.".format(self.name))
 
     def get_file(self, filename):
+        """Returns the child file as a :class:`File`."""
         return File(os.path.join(self.abspath, filename))
 
 
-class ParentFolder(Folder):
-
-    default_icon = "arrow_turn_up.png"
-    icon_map = []
-
-    def __init__(self, child_folder):
-        path = os.path.join(child_folder.path, "..")
-        super(ParentFolder, self).__init__(path, child_folder.root,
-                                                 child_folder.autoindex)
-
-
 class RootFolder(Folder):
+    """This class wraps a root folder."""
 
     default_icon = "server.png"
     icon_map = []
@@ -213,5 +244,17 @@ class RootFolder(Folder):
         super(RootFolder, self).__init__(".", root, autoindex)
 
 
+class _ParentFolder(Folder):
+
+    default_icon = "arrow_turn_up.png"
+    icon_map = []
+
+    def __init__(self, child_folder):
+        path = os.path.join(child_folder.path, "..")
+        super(_ParentFolder, self).__init__(path, child_folder.root,
+                                                 child_folder.autoindex)
+
+
 class GuessError(RuntimeError): pass
+class MarkupError(RuntimeError): pass
 
