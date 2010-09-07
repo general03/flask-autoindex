@@ -16,6 +16,20 @@ def _make_mimetype_matcher(mimetype):
     return lambda ent: fnmatch(guess_type(ent.name)[0] or "", mimetype)
 
 
+def _make_args_for_entry(args, kwargs):
+    if not args:
+        raise TypeError("path is required, but not given")
+    root = autoindex = None
+    args = list(args)
+    try:
+        path = kwargs.get("path", args.pop(0))
+        root = kwargs.get("root", args.pop(0))
+        autoindex = kwargs.get("autoindex", args.pop(0))
+    except IndexError:
+        pass
+    return (path, root, autoindex)
+
+
 class Entry(object):
     """This class wraps file or folder. It is an abstract class, but it returns
     a derived instance. You can make an instance such as::
@@ -28,35 +42,48 @@ class Entry(object):
 
     HIDDEN = re.compile("^\.")
 
-    def __new__(cls, path, root=None, autoindex=None):
+    def __new__(cls, *args, **kwargs):
         """Returns a file or folder instance."""
-        if cls is not Entry:
-            return object.__new__(cls)
-        abspath = os.path.join(root, path)
-        if os.path.isdir(abspath):
-            return Folder(path, root)
-        elif os.path.isfile(abspath):
-            return File(path, root)
+        path, root, autoindex = _make_args_for_entry(args, kwargs)
+        if root:
+            abspath = os.path.join(root.abspath, path)
         else:
-            raise IOError("'{0}' does not exists.".format(fullpath))
+            abspath = os.path.abspath(path)
+        if os.path.isdir(abspath):
+            return Folder.__new__(Folder, path, root, autoindex)
+        elif os.path.isfile(abspath):
+            return object.__new__(File)
+        else:
+            raise IOError("'{0}' does not exists.".format(abspath))
 
     def __init__(self, path, root=None, autoindex=None):
         """Initializes an entry instance."""
+        self.root = root
+        self.autoindex = autoindex
+        try:
+            rootpath = self.root.abspath
+            if not self.autoindex and self.root:
+                self.autoindex = self.root.autoindex
+        except AttributeError:
+            rootpath = ""
         self.path = path
-        if root:
-            self.root = root
-        else:
-            self.root = os.path.abspath(os.path.curdir)
-        self.abspath = os.path.join(self.root, self.path)
+        self.abspath = os.path.join(rootpath, self.path)
         self.name = os.path.basename(self.abspath)
         self.hidden = bool(self.HIDDEN.match(self.name))
-        self.autoindex = autoindex
+
+    def is_root(self):
+        """Returns ``True`` if it is a root folder."""
+        return isinstance(self, RootFolder) or \
+               os.path.samefile(self.abspath, self.root.abspath)
 
     @property
     def parent(self):
         if self.is_root():
             return None
-        return Entry(os.path.dirname(self.path), self.root, self.autoindex)
+        elif os.path.samefile(os.path.dirname(self.abspath),
+                              self.root.abspath):
+            return self.root
+        return Entry(os.path.dirname(self.path), self.root)
 
     @property
     def modified(self):
@@ -113,7 +140,6 @@ class File(Entry):
 
     def __init__(self, path, root=None, autoindex=None):
         super(File, self).__init__(path, root, autoindex)
-        self.size = os.path.getsize(self.abspath)
         try:
             self.ext = re.search(self.EXTENSION, self.name).group(1)
         except AttributeError:
@@ -144,6 +170,11 @@ class File(Entry):
     def mimetype(self):
         """A mimetype of this file."""
         return guess_type(self.abspath)
+
+    @cached_property
+    def size(self):
+        """A size of this file."""
+        return os.path.getsize(self.abspath)
 
     @classmethod
     def add_icon_rule_by_ext(cls, icon, ext):
@@ -177,16 +208,14 @@ class Folder(Entry):
     default_icon = "folder.png"
     icon_map = []
 
-    def __new__(cls, path, root=None, autoindex=None):
-        if cls is not Folder:
-            return object.__new__(cls)
-        elif root and os.path.samefile(os.path.join(root, path), root):
-            return RootFolder(path, root, autoindex)
+    def __new__(cls, *args, **kwargs):
+        path, root, autoindex = _make_args_for_entry(args, kwargs)
+        if not root:
+            return RootFolder.__new__(RootFolder, path, autoindex)
         return object.__new__(cls)
 
-    def is_root(self):
-        """Returns ``True`` if it is a root folder."""
-        return os.path.samefile(self.abspath, self.root)
+    def __init__(self, path, root=None, autoindex=None):
+        super(Folder, self).__init__(path, root, autoindex)
 
     def browse(self, sort_by="name", order=1, show_hidden=False):
         """It is a generator. Each item is an child entry."""
@@ -205,8 +234,8 @@ class Folder(Entry):
         if not self.is_root():
             yield _ParentFolder(self)
         entries = os.listdir(self.abspath)
-        entries = (Entry(os.path.join(self.path, name),
-                         self.root, self.autoindex) for name in entries)
+        entries = (Entry(os.path.join(self.path, name), self.root) \
+                   for name in entries)
         entries = sorted(entries, cmp=compare)
         for ent in entries:
             if show_hidden or not ent.hidden:
@@ -227,11 +256,17 @@ class Folder(Entry):
                              p.startswith(readme_filename + ".")), cmp=compare)
         if readmes:
             return self.get_file(readmes[0])
-        raise IOError("{0} folder has no readme file.".format(self.name))
+        raise IOError("{0} folder has no readme file".format(self.name))
 
     def get_file(self, filename):
         """Returns the child file as a :class:`File`."""
-        return File(os.path.join(self.abspath, filename))
+        if filename in self:
+            return File(os.path.join(self.path, filename), self.root)
+        else:
+            raise IOError("{0} does not exist".format(filename))
+
+    def __contains__(self, path):
+        return os.path.exists(os.path.join(self.abspath, path))
 
 
 class RootFolder(Folder):
@@ -240,8 +275,12 @@ class RootFolder(Folder):
     default_icon = "server.png"
     icon_map = []
 
-    def __init__(self, path, root, autoindex=None):
-        super(RootFolder, self).__init__(".", root, autoindex)
+    def __new__(cls, *args, **kwargs):
+        return object.__new__(cls)
+
+    def __init__(self, path, autoindex=None):
+        super(RootFolder, self).__init__(".", autoindex=autoindex)
+        self.abspath = os.path.abspath(path)
 
 
 class _ParentFolder(Folder):
@@ -249,10 +288,12 @@ class _ParentFolder(Folder):
     default_icon = "arrow_turn_up.png"
     icon_map = []
 
+    def __new__(cls, *args, **kwargs):
+        return object.__new__(cls)
+
     def __init__(self, child_folder):
         path = os.path.join(child_folder.path, "..")
-        super(_ParentFolder, self).__init__(path, child_folder.root,
-                                                 child_folder.autoindex)
+        super(_ParentFolder, self).__init__(path, child_folder.root)
 
 
 class GuessError(RuntimeError): pass

@@ -46,6 +46,7 @@ class AutoIndex(object):
     """
 
     icon_map = []
+    converter_map = []
 
     def _register_shared_autoindex(self, state=None, app=None):
         """Registers a magic module named __autoindex__."""
@@ -56,18 +57,20 @@ class AutoIndex(object):
             app.modules[__autoindex__] = shared_mod
 
     def __new__(cls, base, browse_root=None):
-        if cls is not AutoIndex:
-            return object.__new__(cls)
-        elif isinstance(base, Flask):
-            return AutoIndexApplication(base, browse_root)
+        if isinstance(base, Flask):
+            return object.__new__(AutoIndexApplication)
         elif isinstance(base, Module):
-            return AutoIndexModule(base, browse_root)
+            return object.__new__(AutoIndexModule)
         else:
             raise TypeError("'base' should be Flask or Module.")
 
     def __init__(self, base, browse_root=None):
         """Initializes an autoindex instance."""
         self.base, self.browse_root = base, browse_root
+        if self.browse_root:
+            self.root = RootFolder(self.browse_root, autoindex=self)
+        else:
+            self.root = None
         self.silk = Silk(self.base)
         self.base.jinja_loader = self.jinja_loader
         for rule in "/", "/<path:path>":
@@ -75,12 +78,12 @@ class AutoIndex(object):
 
     def browse(self, path="."):
         """Browses the files from the path."""
-        abspath = os.path.join(self.browse_root, path)
+        abspath = os.path.join(self.root.abspath, path)
         path = re.sub("\/*$", "", path)
         if os.path.isdir(abspath):
             sort_by = request.args.get("sort_by", "name")
             order = {"asc": 1, "desc": -1}[request.args.get("order", "asc")]
-            curdir = Folder(path, self.browse_root, self)
+            curdir = Folder(path, self.root)
             titlepath = "/" + ("" if path == "." else path)
             prefix = self.template_prefix
             entries = curdir.browse(sort_by=sort_by, order=order)
