@@ -132,7 +132,7 @@ class Entry(object):
 class File(Entry):
     """This class wraps a file."""
 
-    EXTENSION = re.compile("\.(.+)$")
+    EXTENSION = re.compile("\.([^.]+)$")
 
     default_icon = "page_white.png"
     icon_map = []
