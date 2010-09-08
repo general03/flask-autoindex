@@ -19,23 +19,23 @@ def _make_mimetype_matcher(mimetype):
 def _make_args_for_entry(args, kwargs):
     if not args:
         raise TypeError("path is required, but not given")
-    root = autoindex = None
+    rootdir = autoindex = None
     args = list(args)
     try:
         path = kwargs.get("path", args.pop(0))
-        root = kwargs.get("root", args.pop(0))
+        rootdir = kwargs.get("rootdir", args.pop(0))
         autoindex = kwargs.get("autoindex", args.pop(0))
     except IndexError:
         pass
-    return (path, root, autoindex)
+    return (path, rootdir, autoindex)
 
 
 class Entry(object):
-    """This class wraps file or folder. It is an abstract class, but it returns
-    a derived instance. You can make an instance such as::
+    """This class wraps file or directory. It is an abstract class, but it
+    returns a derived instance. You can make an instance such as::
 
-        folder = Entry("/home/someone/public_html")
-        assert isinstance(foler, Folder)
+        directory = Entry("/home/someone/public_html")
+        assert isinstance(foler, Directory)
         file = Entry("/home/someone/public_html/favicon.ico")
         assert isinstance(file, File)
     """
@@ -43,27 +43,27 @@ class Entry(object):
     HIDDEN = re.compile("^\.")
 
     def __new__(cls, *args, **kwargs):
-        """Returns a file or folder instance."""
-        path, root, autoindex = _make_args_for_entry(args, kwargs)
-        if root:
-            abspath = os.path.join(root.abspath, path)
+        """Returns a file or directory instance."""
+        path, rootdir, autoindex = _make_args_for_entry(args, kwargs)
+        if rootdir:
+            abspath = os.path.join(rootdir.abspath, path)
         else:
             abspath = os.path.abspath(path)
         if os.path.isdir(abspath):
-            return Folder.__new__(Folder, path, root, autoindex)
+            return Directory.__new__(Directory, path, rootdir, autoindex)
         elif os.path.isfile(abspath):
             return object.__new__(File)
         else:
             raise IOError("'{0}' does not exists.".format(abspath))
 
-    def __init__(self, path, root=None, autoindex=None):
+    def __init__(self, path, rootdir=None, autoindex=None):
         """Initializes an entry instance."""
-        self.root = root
+        self.rootdir = rootdir
         self.autoindex = autoindex
         try:
-            rootpath = self.root.abspath
-            if not self.autoindex and self.root:
-                self.autoindex = self.root.autoindex
+            rootpath = self.rootdir.abspath
+            if not self.autoindex and self.rootdir:
+                self.autoindex = self.rootdir.autoindex
         except AttributeError:
             rootpath = ""
         self.path = path
@@ -72,18 +72,17 @@ class Entry(object):
         self.hidden = bool(self.HIDDEN.match(self.name))
 
     def is_root(self):
-        """Returns ``True`` if it is a root folder."""
-        return isinstance(self, RootFolder) or \
-               os.path.samefile(self.abspath, self.root.abspath)
+        """Returns ``True`` if it is a root directory."""
+        return isinstance(self, RootDirectory)
 
     @property
     def parent(self):
         if self.is_root():
             return None
         elif os.path.samefile(os.path.dirname(self.abspath),
-                              self.root.abspath):
-            return self.root
-        return Entry(os.path.dirname(self.path), self.root)
+                              self.rootdir.abspath):
+            return self.rootdir
+        return Entry(os.path.dirname(self.path), self.rootdir)
 
     @property
     def modified(self):
@@ -136,30 +135,13 @@ class File(Entry):
 
     default_icon = "page_white.png"
     icon_map = []
-    converter_map = []
 
-    def __init__(self, path, root=None, autoindex=None):
-        super(File, self).__init__(path, root, autoindex)
+    def __init__(self, path, rootdir=None, autoindex=None):
+        super(File, self).__init__(path, rootdir, autoindex)
         try:
             self.ext = re.search(self.EXTENSION, self.name).group(1)
         except AttributeError:
             self.ext = None
-
-    def to_html(self):
-        """Converts to HTML format."""
-        text = self.data.decode("utf-8")
-        try:
-            if self.autoindex:
-                converter_map = self.autoindex.converter_map + \
-                                self.converter_map
-            else:
-                converter_map = self.converter_map
-            for converter, rule in converter_map:
-                if rule(self):
-                    return converter(self)
-        except AttributeError:
-            pass
-        raise MarkupError("It could not be converted to HTML.")
 
     @cached_property
     def data(self):
@@ -186,39 +168,45 @@ class File(Entry):
         """Adds a new icon rule by the mimetype globally."""
         cls.add_icon_rule(icon, _make_mimetype_matcher(mimetype))
 
-    @classmethod
-    def add_html_converter(cls, converter, rule):
-        """Adds a new html converter globally."""
-        cls.converter_map.append((converter, rule))
 
-    @classmethod
-    def add_html_converter_by_ext(cls, converter, ext):
-        """Adds a new html converter by the file extension globally."""
-        cls.add_html_converter(converter, lambda ent: ent.ext == ext)
+class _DirectoryMeta(type):
+    """The meta class for :class:`Directory`."""
 
-    @classmethod
-    def add_html_converter_by_mimetype(cls, converter, mimetype):
-        """Adds a new html converter by the mimetype globally."""
-        cls.add_html_converter(converter, _make_mimetype_matcher(mimetype))
+    def __call__(cls, *args, **kwargs):
+        """If an instance already initialized, just returns."""
+        dir = cls.__new__(cls, *args, **kwargs)
+        try:
+            dir.path
+        except AttributeError:
+            dir.__init__(*args, **kwargs)
+        return dir
 
 
-class Folder(Entry):
-    """This class wraps a folder."""
+class Directory(Entry):
+    """This class wraps a directory."""
+
+    __metaclass__ = _DirectoryMeta
 
     default_icon = "folder.png"
     icon_map = []
 
     def __new__(cls, *args, **kwargs):
-        path, root, autoindex = _make_args_for_entry(args, kwargs)
-        if not root:
-            return RootFolder.__new__(RootFolder, path, autoindex)
+        """If the path is same with root path, it returns a
+        :class:`RootDirectory` object.
+        """
+        path, rootdir, autoindex = _make_args_for_entry(args, kwargs)
+        if rootdir:
+            rootpath = rootdir.abspath
+        else:
+            rootpath = os.path.curdir
+        if os.path.samefile(os.path.join(rootpath, path), rootpath):
+            if not rootdir:
+                rootdir = RootDirectory(rootpath, autoindex)
+            return rootdir
         return object.__new__(cls)
 
-    def __init__(self, path, root=None, autoindex=None):
-        super(Folder, self).__init__(path, root, autoindex)
-
-    def browse(self, sort_by="name", order=1, show_hidden=False):
-        """It is a generator. Each item is an child entry."""
+    def explore(self, sort_by="name", order=1, show_hidden=False):
+        """It is a generator. Each item is a child entry."""
         def compare(ent1, ent2):
             def asc():
                 if sort_by != "modified" and type(ent1) is not type(ent2):
@@ -232,45 +220,44 @@ class Folder(Entry):
                                    getattr(ent2, "name"))
             return asc() * order
         if not self.is_root():
-            yield _ParentFolder(self)
+            yield _ParentDirectory(self)
+            rootdir = self.rootdir
+        else:
+            rootdir = self
         entries = os.listdir(self.abspath)
-        entries = (Entry(os.path.join(self.path, name), self.root) \
+        entries = (Entry(os.path.join(self.path, name), rootdir) \
                    for name in entries)
         entries = sorted(entries, cmp=compare)
         for ent in entries:
             if show_hidden or not ent.hidden:
                 yield ent
 
-    def get_readme(self, readme_filename="README",
-                   compare=lambda x, y: -cmp(len(x), len(y))):
-        """Returns a readme file. If this folder has many readme files, it
-        sorts them and returns the first readme file.
-        
-        :param readme_filename: a name of readme file. The default is
-                                ``README``.
-        :param compare: a function for sort readme files. when it is passed,
-                        this method returns a file which has a longest name.
-        """
-        readmes = sorted((p for p in os.listdir(self.abspath) \
-                          if p == readme_filename or \
-                             p.startswith(readme_filename + ".")), cmp=compare)
-        if readmes:
-            return self.get_file(readmes[0])
-        raise IOError("{0} folder has no readme file".format(self.name))
-
     def get_file(self, filename):
-        """Returns the child file as a :class:`File`."""
+        """Returns the child file as a :class:`File`.
+        """
         if filename in self:
-            return File(os.path.join(self.path, filename), self.root)
+            return File(os.path.join(self.path, filename), self.rootdir)
         else:
             raise IOError("{0} does not exist".format(filename))
 
-    def __contains__(self, path):
+    def __contains__(self, path_or_entry):
+        """Checks this directory has a file or directory.
+
+            public_html = Directory("public_html")
+            "favicon.ico" in public_html
+            File("favicon.ico", public_html) in public_html
+        """
+        if isinstance(path_or_entry, Entry):
+            path = os.path.relpath(path_or_entry.path, self.path)
+            if os.path.pardir in path:
+                return False
+        else:
+            path = path_or_entry
         return os.path.exists(os.path.join(self.abspath, path))
 
 
-class RootFolder(Folder):
-    """This class wraps a root folder."""
+class RootDirectory(Directory):
+    """This class wraps a root directory."""
 
     default_icon = "server.png"
     icon_map = []
@@ -279,11 +266,12 @@ class RootFolder(Folder):
         return object.__new__(cls)
 
     def __init__(self, path, autoindex=None):
-        super(RootFolder, self).__init__(".", autoindex=autoindex)
+        super(RootDirectory, self).__init__(".", autoindex=autoindex)
         self.abspath = os.path.abspath(path)
 
 
-class _ParentFolder(Folder):
+class _ParentDirectory(Directory):
+    """This class wraps a parent directory."""
 
     default_icon = "arrow_turn_up.png"
     icon_map = []
@@ -291,9 +279,9 @@ class _ParentFolder(Folder):
     def __new__(cls, *args, **kwargs):
         return object.__new__(cls)
 
-    def __init__(self, child_folder):
-        path = os.path.join(child_folder.path, "..")
-        super(_ParentFolder, self).__init__(path, child_folder.root)
+    def __init__(self, child_directory):
+        path = os.path.join(child_directory.path, "..")
+        super(_ParentDirectory, self).__init__(path, child_directory.rootdir)
 
 
 class GuessError(RuntimeError): pass

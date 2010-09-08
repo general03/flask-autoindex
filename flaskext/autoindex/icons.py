@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .entry import File, Folder, Default
+from .entry import File, Default
 
 
 by_extension = [

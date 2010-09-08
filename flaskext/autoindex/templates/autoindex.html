@@ -17,7 +17,7 @@
     <table>
       <thead>
         {{ thead() }}
-        {% if path != "/" %}
+        {% if not curdir.is_root() %}
           <tr>
             <td class="breadcrumb" colspan="4">
               <h1>{{ breadcrumb(curdir) }}</h1>
@@ -31,13 +31,6 @@
         {% endfor %}
       </tbody>
     </table>
-  {% endblock %}
-  {% block readme %}
-    {% if readme %}
-      <div id="readme">
-        {{ readme|safe }}
-      </div>
-    {% endif %}
   {% endblock %}
   {% block footer %}
     {% set env = request.environ %}

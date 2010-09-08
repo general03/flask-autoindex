@@ -57,7 +57,7 @@
     {{ breadcrumb(parent) }}
     <span class="sep">&raquo;</span>
   {% endif %}
-  <a href="{{ url_for("browse", path=ent.path) }}">
+  <a href="{{ url_for("autoindex", path=ent.path) }}">
     {% set icon = ent.guess_icon() %}
     {% if icon %}
       <img src="{{ icon }}" />
