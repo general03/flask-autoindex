@@ -30,6 +30,19 @@ def _make_args_for_entry(args, kwargs):
     return (path, rootdir, autoindex)
 
 
+class _EntryMeta(type):
+    """The meta class for :class:`Entry`."""
+
+    def __call__(cls, *args, **kwargs):
+        """If an instance already initialized, just returns."""
+        ent = cls.__new__(cls, *args, **kwargs)
+        try:
+            ent.path
+        except AttributeError:
+            ent.__init__(*args, **kwargs)
+        return ent
+
+
 class Entry(object):
     """This class wraps file or directory. It is an abstract class, but it
     returns a derived instance. You can make an instance such as::
@@ -39,6 +52,8 @@ class Entry(object):
         file = Entry("/home/someone/public_html/favicon.ico")
         assert isinstance(file, File)
     """
+
+    __metaclass__ = _EntryMeta
 
     HIDDEN = re.compile("^\.")
 
@@ -52,7 +67,7 @@ class Entry(object):
         if os.path.isdir(abspath):
             return Directory.__new__(Directory, path, rootdir, autoindex)
         elif os.path.isfile(abspath):
-            return object.__new__(File)
+            return File.__new__(File, path, rootdir, autoindex)
         else:
             raise IOError("'{0}' does not exists.".format(abspath))
 
@@ -62,7 +77,7 @@ class Entry(object):
         self.autoindex = autoindex
         try:
             rootpath = self.rootdir.abspath
-            if not self.autoindex and self.rootdir:
+            if not autoindex and self.rootdir:
                 self.autoindex = self.rootdir.autoindex
         except AttributeError:
             rootpath = ""
@@ -70,6 +85,8 @@ class Entry(object):
         self.abspath = os.path.join(rootpath, self.path)
         self.name = os.path.basename(self.abspath)
         self.hidden = bool(self.HIDDEN.match(self.name))
+        if self.rootdir:
+            self.rootdir._register_descendant(self)
 
     def is_root(self):
         """Returns ``True`` if it is a root directory."""
@@ -125,7 +142,10 @@ class Entry(object):
                 return self.default_icon
             except AttributeError:
                 raise GuessError("There is no matched icon.")
-        return urljoin(url_for("silkicon", filename=""), get_icon_url())
+        try:
+            return urljoin(url_for("silkicon", filename=""), get_icon_url())
+        except AttributeError:
+            return get_icon_url()
 
 
 class File(Entry):
@@ -135,6 +155,13 @@ class File(Entry):
 
     default_icon = "page_white.png"
     icon_map = []
+
+    def __new__(cls, path, rootdir=None, autoindex=None):
+        try:
+            return rootdir._descendants[(path, autoindex)]
+        except (AttributeError, KeyError):
+            pass
+        return object.__new__(cls)
 
     def __init__(self, path, rootdir=None, autoindex=None):
         super(File, self).__init__(path, rootdir, autoindex)
@@ -169,23 +196,8 @@ class File(Entry):
         cls.add_icon_rule(icon, _make_mimetype_matcher(mimetype))
 
 
-class _DirectoryMeta(type):
-    """The meta class for :class:`Directory`."""
-
-    def __call__(cls, *args, **kwargs):
-        """If an instance already initialized, just returns."""
-        dir = cls.__new__(cls, *args, **kwargs)
-        try:
-            dir.path
-        except AttributeError:
-            dir.__init__(*args, **kwargs)
-        return dir
-
-
 class Directory(Entry):
     """This class wraps a directory."""
-
-    __metaclass__ = _DirectoryMeta
 
     default_icon = "folder.png"
     icon_map = []
@@ -195,10 +207,13 @@ class Directory(Entry):
         :class:`RootDirectory` object.
         """
         path, rootdir, autoindex = _make_args_for_entry(args, kwargs)
-        if rootdir:
-            rootpath = rootdir.abspath
-        else:
-            rootpath = os.path.curdir
+        if not rootdir:
+            return RootDirectory(path, autoindex)
+        try:
+            return rootdir._descendants[(path, autoindex)]
+        except KeyError:
+            pass
+        rootpath = rootdir.abspath
         if os.path.samefile(os.path.join(rootpath, path), rootpath):
             if not rootdir:
                 rootdir = RootDirectory(rootpath, autoindex)
@@ -232,13 +247,16 @@ class Directory(Entry):
             if show_hidden or not ent.hidden:
                 yield ent
 
-    def get_file(self, filename):
-        """Returns the child file as a :class:`File`.
-        """
-        if filename in self:
-            return File(os.path.join(self.path, filename), self.rootdir)
+    def get_child(self, childname):
+        """Returns a child file or directory."""
+        if childname in self:
+            if self.path != ".":
+                path = os.path.join(self.path, childname)
+            else:
+                path = childname
+            return Entry(path, self.rootdir)
         else:
-            raise IOError("{0} does not exist".format(filename))
+            raise IOError("{0} does not exist".format(childname))
 
     def __contains__(self, path_or_entry):
         """Checks this directory has a file or directory.
@@ -261,13 +279,27 @@ class RootDirectory(Directory):
 
     default_icon = "server.png"
     icon_map = []
+    _rootdirs = {}
 
-    def __new__(cls, *args, **kwargs):
-        return object.__new__(cls)
+    def __new__(cls, path, autoindex=None):
+        try:
+            return RootDirectory._rootdirs[(path, autoindex)]
+        except KeyError:
+            return object.__new__(cls)
 
     def __init__(self, path, autoindex=None):
         super(RootDirectory, self).__init__(".", autoindex=autoindex)
         self.abspath = os.path.abspath(path)
+        self.rootdir = self
+        self._descendants = {}
+        RootDirectory._register_rootdir(self)
+
+    @classmethod
+    def _register_rootdir(cls, rootdir):
+        cls._rootdirs[(rootdir.abspath, rootdir.autoindex)] = rootdir
+
+    def _register_descendant(self, entry):
+        self._descendants[(entry.path, entry.autoindex)] = entry
 
 
 class _ParentDirectory(Directory):
