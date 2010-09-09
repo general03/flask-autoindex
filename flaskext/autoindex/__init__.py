@@ -72,13 +72,15 @@ class AutoIndex(object):
             def autoindex(path="."):
                 return self.render_autoindex(path)
 
-    def render_autoindex(self, path, browse_root=None, template=None):
+    def render_autoindex(self, path, browse_root=None, template=None,
+                         endpoint="autoindex"):
         """Renders an autoindex with the given path.
 
         :param path: the relative path
         :param browse_root: if it is specified, it used to a path which is
                             served by root address.
         :param template: a template name
+        :param endpoint: an endpoint which is a function
         """
         if browse_root:
             rootdir = RootDirectory(browse_root, autoindex=self)
@@ -91,8 +93,10 @@ class AutoIndex(object):
             order = {"asc": 1, "desc": -1}[request.args.get("order", "asc")]
             curdir = Directory(path, rootdir)
             entries = curdir.explore(sort_by=sort_by, order=order)
+            if callable(endpoint):
+                endpoint = endpoint.__name__
             context = dict(curdir=curdir, path=path, entries=entries,
-                           sort_by=sort_by, order=order, readme=None)
+                           sort_by=sort_by, order=order, endpoint=endpoint)
             if template:
                 return render_template(template, **context)
             try:
