@@ -133,7 +133,7 @@ class ApplicationTestCase(unittest.TestCase):
         self.app = Flask(__name__)
         self.app2 = Flask(__name__ + "2")
         self.idx = AutoIndex(self.app, browse_root, add_url_rules=True)
-        self.idx2 = AutoIndex(self.app2)
+        self.idx2 = AutoIndex(self.app2, silk_path="/myicons")
         #self.idx3 = AutoIndex()
         @self.app2.route("/")
         @self.app2.route("/<path:path>")
@@ -157,9 +157,10 @@ class ApplicationTestCase(unittest.TestCase):
             assert 200 == rv.status_code
 
     def test_icon(self):
-        for get in self.get, self.get2:
-            rv = get("/icons/page_white.png")
-            assert 294 == len(rv.data)
+        rv = self.get("/icons/page_white.png")
+        rv2 = self.get2("/myicons/page_white.png")
+        assert 294 == len(rv.data)
+        assert rv.data == rv2.data
 
     def test_autoindex(self):
         for get in self.get, self.get2:

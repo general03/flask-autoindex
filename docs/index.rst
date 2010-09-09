@@ -36,60 +36,28 @@ How to Use
 
 Flask-AutoIndex is easy and extensible. It supports flask application.
 
-..
-    TODO:
-    - change "flask application" to "flask application and module"
-    - add "It means we can make variety autoindex applications in one process."
-
 We will make the application in flask application. There is a basic usage::
 
     import os.path
     from flask import Flask
     from flaskext.autoindex import AutoIndex
+
     app = Flask(__name__)
     idx = AutoIndex(app, browse_root=os.path.curdir)
 
+    @app.route("/")
+    @app.route("/<path:path>")
+    def autoindex(path="."):
+        return idx.render_autoindex(path)
+
 After running the application, ``http://localhost/`` serves a generated index
-page which contains the file and folder list in current directory.
-
-..
-    If you want to make the application in flask module, follow the below
-    exmaple::
-
-        # path: testapp/testmodule/__init__.py
-        from flask import Module
-        from flaskext.autoindex import AutoIndex
-        mod = Module(__name__, subdomain="test")
-        idx = AutoIndex(mod, browse_root="/var/www/public_html")
-
-    ::
-
-        # path: testapp/__init__.py
-        from flask import Flask
-        from testmodule import mod
-        app = Flask(__name__)
-        app.config["SERVER_NAME"] = "localhost"
-        app.register_module(mod)
-
-    This time, ``http://localhost/`` served nothing. But
-    ``http://test.localhost/`` serves the file and folder list in
-    ``/var/www/public_html``. You can register more modules as same way.
+page which contains the file and directory list in current directory.
 
 Customizing
 ===========
 
-Adding icon rules
-`````````````````
-
-If you want to present ``*.feed`` files with ``rss.png`` icon and present
-a folder named ``picture`` with ``folder_picture.png`` icon, follow the below
-example::
-
-    idx.add_icon_rule("rss.png", ext="feed")
-    idx.add_icon_rule("folder_picture.png", foldername="pictures")
-
-Adding specified paths
-``````````````````````
+Routing a specified URL
+```````````````````````
 
 Just like a nomal flask application or module. Follow the below example::
 
@@ -98,7 +66,91 @@ Just like a nomal flask application or module. Follow the below example::
         return "Hello, world!", 200
 
 ``http://localhost/helloworld`` will serve ``Hello, world!`` not 
-``/helloworld`` folder.
+``/helloworld`` directory.
+
+Adding an icon rule
+```````````````````
+
+If you want to present ``*.feed`` files with ``rss.png`` icon and present
+a directory named ``picture`` with ``folder_picture.png`` icon, follow the
+below example::
+
+    idx.add_icon_rule("rss.png", ext="feed")
+    idx.add_icon_rule("folder_picture.png", dirname="pictures")
+
+You can change the root directory's icon to your own icon::
+
+    idx.add_icon_rule("http://example.org/favicon.ico", cls=RootDirectory)
+
+Also you can add the more complex rule with a function::
+
+    import re
+    def is_flaskext(ent):
+        return isinstance(ent, Directory) and re.match("[Ff]lask-", ent.name)
+    idx.add_icon_rule("http://example.org/flask-extenstion.png", is_flaskext)
+
+Here is a nice example for changing directory's icon to its ``favicon.ico``
+file if it exists::
+
+    def get_favicon(ent):
+        favicon = "favicon.ico"
+        if type(ent) is Directory and favicon in ent:
+            return "/" + os.path.join(ent.path, favicon)
+        return False
+    idx.add_icon_rule(get_favicon)
+
+.. seealso:: :meth:`AutoIndex.add_icon_rule`
+
+Changing Silk's path
+````````````````````
+
+:class:`AutoIndex` has ``**silk_options`` keyword arguments for :class:`Silk`.
+If you want to use the another path for serving silk icons, use ``silk_path``
+keyword argument::
+
+    idx = AutoIndex(app, silk_path="/myicons")
+
+Now you can get a silk icon from ``http://localhost/myicons/folder.png`` not
+``http://localhost/icons/folder.png``.
+
+.. seealso::
+   The documentation for `Flask-Silk <http://packages.python.org/Flask-Silk>`_
+
+Redesigning the template
+````````````````````````
+
+:meth:`AutoIndex.render_autoindex` finds the template from the application's
+template directory first. When you made the ``autoindex.html`` to the
+application's template directory, :meth:`AutoIndex.render_autoindex` renders
+your template::
+
+    - myapplication
+      - templates
+        - autoindex.html
+      - __init__.py
+      - views.py
+
+Your templates could extend the default Flask-AutoIndex's template, it named
+``__autoindex__/autoindex.html``. Here is a basic example:
+
+.. sourcecode:: jinja
+
+   {% extends "__autoindex__/autoindex.html" %}
+
+   {% block meta %}
+     {{ super() }}
+     <link rel="stylesheet"
+       href="{{ url_for("static", filename="myautoindex.css") }}" />
+   {% endblock %}
+
+   {% block header %}
+     <div style="width: 500px; margin: 30px auto;">
+       <h2>My Application</h2>
+   {% endblock %}
+
+   {% block footer %}
+     </div>
+   {% endblock %}
 
 API
 ===
@@ -109,18 +161,56 @@ Configuration
 .. autoclass:: AutoIndex
    :members:
 
-.. autoclass:: AutoIndexApplication
-   :members:
-
-..
-    .. autoclass:: AutoIndexModule
-       :members:
-
 Models
 ``````
 
 .. autoclass:: Entry
    :members:
+
+.. autoclass:: File
+   :members:
+
+.. autoclass:: Directory
+   :members:
+
+.. autoclass:: RootDirectory
+   :members:
+
+Template
+````````
+
+Blocks
+------
+
+`meta`
+    The innerHTML of ``<head>``.
+
+`header`
+    The top of ``<body>``.
+
+`table`
+    The table for the entry list.
+
+`footer`
+    The bottom of ``<body>``.
+
+Variables
+---------
+
+`curdir`
+    The current directory object.
+
+`entries`
+    The child entry list of ``curdir``.
+
+`sort_by`
+    The sorting key.
+
+`order`
+    Ascending order(``1``) or Descending order(``-1``).
+
+`endpoint`
+    The endpoint which renders a generated page.
 
 Indices and tables
 ==================

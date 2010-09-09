@@ -29,6 +29,13 @@ class AutoIndex(object):
 
         app = Flask(__name__)
         idx = AutoIndex(app, "/home/someone/public_html", add_url_rules=True)
+
+    :param base: a flask application
+    :param browse_root: a path which is served by root address.
+    :param add_url_rules: if it is ``True``, the wrapped application routes
+                          ``/`` and ``/<path:path>`` to autoindex. default
+                          is ``False``.
+    :param **silk_options: keyword options for :class:`flaskext.silk.Silk`
     """
 
     def _register_shared_autoindex(self, state=None, app=None):
@@ -49,15 +56,7 @@ class AutoIndex(object):
 
     def __init__(self, base, browse_root=None, add_url_rules=False,
                  **silk_options):
-        """Initializes an autoindex instance.
-
-        :param base: a flask application
-        :param browse_root: a path which is served by root address.
-        :param add_url_rules: if it is ``True``, the wrapped application routes
-                              ``/`` and ``/<path:path>`` to autoindex. default
-                              is ``False``.
-        :param **silk_options: keyword options for :class:`flaskext.silk.Silk`
-        """
+        """Initializes an autoindex instance."""
         self.base = base
         if browse_root:
             self.rootdir = RootDirectory(browse_root, autoindex=self)
@@ -95,7 +94,7 @@ class AutoIndex(object):
             entries = curdir.explore(sort_by=sort_by, order=order)
             if callable(endpoint):
                 endpoint = endpoint.__name__
-            context = dict(curdir=curdir, path=path, entries=entries,
+            context = dict(curdir=curdir, entries=entries,
                            sort_by=sort_by, order=order, endpoint=endpoint)
             if template:
                 return render_template(template, **context)
