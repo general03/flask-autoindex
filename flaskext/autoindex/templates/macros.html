@@ -6,7 +6,8 @@
         <img src="{{ icon }}" />
       {% endif %}
     </td>
-    <td class="name"><a href="/{{ ent.path }}">
+    <td class="name">
+      <a href="{{ url_for(endpoint, path=ent.path) }}">
       {%- if ent.name == ".." -%}
         Parent folder
       {%- else -%}
@@ -29,7 +30,7 @@
 {% macro th(key, label, colspan=1) %}
   <th class="{{ key }}" colspan="{{ colspan }}">
     {%- if sort_by == key and order > 0 -%}
-      <a href="?sort_by={{ key }}&order=desc">{{ label }}</a>
+      <a href="?sort_by={{ key }}&amp;order=desc">{{ label }}</a>
     {%- else -%}
       <a href="?sort_by={{ key }}">{{ label }}</a>
     {%- endif -%}
@@ -57,7 +58,7 @@
     {{ breadcrumb(parent) }}
     <span class="sep">&raquo;</span>
   {% endif %}
-  <a href="{{ url_for("autoindex", path=ent.path) }}">
+  <a href="{{ url_for(endpoint, path=ent.path) }}">
     {% set icon = ent.guess_icon() %}
     {% if icon %}
       <img src="{{ icon }}" />
