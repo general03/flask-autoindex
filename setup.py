@@ -14,7 +14,7 @@ Links
 
 * `documentation <http://docs.sublee.kr/flask-autoindex>`_
 * `development version
-  <http://github.com/sublee/flask-autoindex/zipball/master>`_
+  <http://github.com/sublee/flask-autoindex/zipball/master#egg=flask-autoindex-dev>`_>`_
 
 """
 try:
