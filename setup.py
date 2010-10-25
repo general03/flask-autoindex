@@ -14,7 +14,7 @@ Links
 
 * `documentation <http://docs.sublee.kr/flask-autoindex>`_
 * `development version
-  <http://github.com/sublee/flask-autoindex/zipball/master#egg=flask-autoindex-dev>`_>`_
+  <http://github.com/sublee/flask-autoindex/zipball/master#egg=flask-autoindex-dev>`_
 
 """
 try:
@@ -33,7 +33,7 @@ setup(
     version="0.3.0",
     url="http://github.com/sublee/flask-autoindex",
     license="BSD",
-    author="Lee Heung-sub",
+    author="Heungsub Lee",
     author_email="heung@sublee.kr",
     description="A mod_autoindex for Flask",
     long_description=__doc__,
