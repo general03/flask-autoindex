@@ -221,4 +221,3 @@ class AutoIndexModule(AutoIndex):
     @cached_property
     def template_prefix(self):
         return self.mod.name + "/"
-

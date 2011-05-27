@@ -77,4 +77,3 @@ for icon, filenames in by_filename:
 for icon, mimetypes in by_mimetype:
     for mimetype in to_list(mimetypes):
         File.add_icon_rule_by_mimetype(icon, mimetype)
-

@@ -34,7 +34,7 @@ setup(
     url="http://github.com/sublee/flask-autoindex",
     license="BSD",
     author="Heungsub Lee",
-    author_email="heung@sublee.kr",
+    author_email="h@subl.ee",
     description="A mod_autoindex for Flask",
     long_description=__doc__,
     packages=["flaskext", "flaskext.autoindex"],
@@ -59,4 +59,3 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules"
     ]
 )
-

@@ -318,4 +318,3 @@ class _ParentDirectory(Directory):
 
 class GuessError(RuntimeError): pass
 class MarkupError(RuntimeError): pass
-
