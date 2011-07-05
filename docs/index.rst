@@ -43,12 +43,10 @@ We will make the application in flask application. There is a basic usage::
     from flaskext.autoindex import AutoIndex
 
     app = Flask(__name__)
-    idx = AutoIndex(app, browse_root=os.path.curdir)
+    AutoIndex(app, browse_root=os.path.curdir)
 
-    @app.route("/")
-    @app.route("/<path:path>")
-    def autoindex(path="."):
-        return idx.render_autoindex(path)
+    if __name__ == '__main__':
+        app.run()
 
 After running the application, ``http://localhost/`` serves a generated index
 page which contains the file and directory list in current directory.
@@ -61,9 +59,9 @@ Routing a specified URL
 
 Just like a nomal flask application or module. Follow the below example::
 
-    @app.route("/helloworld")
+    @app.route('/helloworld')
     def helloworld():
-        return "Hello, world!", 200
+        return 'Hello, world!', 200
 
 ``http://localhost/helloworld`` will serve ``Hello, world!`` not 
 ``/helloworld`` directory.
@@ -75,27 +73,27 @@ If you want to present ``*.feed`` files with ``rss.png`` icon and present
 a directory named ``picture`` with ``folder_picture.png`` icon, follow the
 below example::
 
-    idx.add_icon_rule("rss.png", ext="feed")
-    idx.add_icon_rule("folder_picture.png", dirname="pictures")
+    idx.add_icon_rule('rss.png', ext='feed')
+    idx.add_icon_rule('folder_picture.png', dirname='pictures')
 
 You can change the root directory's icon to your own icon::
 
-    idx.add_icon_rule("http://example.org/favicon.ico", cls=RootDirectory)
+    idx.add_icon_rule('http://example.org/favicon.ico', cls=RootDirectory)
 
 Also you can add the more complex rule with a function::
 
     import re
     def is_flaskext(ent):
-        return isinstance(ent, Directory) and re.match("[Ff]lask-", ent.name)
-    idx.add_icon_rule("http://example.org/flask-extenstion.png", is_flaskext)
+        return isinstance(ent, Directory) and re.match('[Ff]lask-', ent.name)
+    idx.add_icon_rule('http://example.org/flask-extenstion.png', is_flaskext)
 
 Here is a nice example for changing directory's icon to its ``favicon.ico``
 file if it exists::
 
     def get_favicon(ent):
-        favicon = "favicon.ico"
+        favicon = 'favicon.ico'
         if type(ent) is Directory and favicon in ent:
-            return "/" + os.path.join(ent.path, favicon)
+            return '/' + os.path.join(ent.path, favicon)
         return False
     idx.add_icon_rule(get_favicon)
 
@@ -108,10 +106,10 @@ Changing Silk's path
 If you want to use the another path for serving silk icons, use ``silk_path``
 keyword argument::
 
-    idx = AutoIndex(app, silk_path="/myicons")
+    idx = AutoIndex(app, silk_path='/myicons')
 
 Now you can get a silk icon from ``http://localhost/myicons/folder.png`` not
-``http://localhost/icons/folder.png``.
+``http://localhost/__icons__/folder.png``.
 
 .. seealso::
    The documentation for `Flask-Silk <http://packages.python.org/Flask-Silk>`_
@@ -135,12 +133,12 @@ Your templates could extend the default Flask-AutoIndex's template, it named
 
 .. sourcecode:: jinja
 
-   {% extends "__autoindex__/autoindex.html" %}
+   {% extends '__autoindex__/autoindex.html' %}
 
    {% block meta %}
      {{ super() }}
      <link rel="stylesheet"
-       href="{{ url_for("static", filename="myautoindex.css") }}" />
+       href="{{ url_for('static', filename='myautoindex.css') }}" />
    {% endblock %}
 
    {% block header %}
