@@ -30,7 +30,7 @@ def run_tests():
 
 setup(
     name='Flask-AutoIndex',
-    version='0.3.2',
+    version='0.4.0',
     url='http://github.com/sublee/flask-autoindex',
     license='BSD',
     author='Heungsub Lee',
