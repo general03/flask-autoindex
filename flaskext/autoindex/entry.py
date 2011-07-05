@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os.path
 import re
 from urlparse import urljoin
@@ -13,18 +12,18 @@ Default = None
 
 
 def _make_mimetype_matcher(mimetype):
-    return lambda ent: fnmatch(guess_type(ent.name)[0] or "", mimetype)
+    return lambda ent: fnmatch(guess_type(ent.name)[0] or '', mimetype)
 
 
 def _make_args_for_entry(args, kwargs):
     if not args:
-        raise TypeError("path is required, but not given")
+        raise TypeError('path is required, but not given')
     rootdir = autoindex = None
     args = list(args)
     try:
-        path = kwargs.get("path", args.pop(0))
-        rootdir = kwargs.get("rootdir", args.pop(0))
-        autoindex = kwargs.get("autoindex", args.pop(0))
+        path = kwargs.get('path', args.pop(0))
+        rootdir = kwargs.get('rootdir', args.pop(0))
+        autoindex = kwargs.get('autoindex', args.pop(0))
     except IndexError:
         pass
     return (path, rootdir, autoindex)
@@ -47,15 +46,15 @@ class Entry(object):
     """This class wraps file or directory. It is an abstract class, but it
     returns a derived instance. You can make an instance such as::
 
-        directory = Entry("/home/someone/public_html")
+        directory = Entry('/home/someone/public_html')
         assert isinstance(foler, Directory)
-        file = Entry("/home/someone/public_html/favicon.ico")
+        file = Entry('/home/someone/public_html/favicon.ico')
         assert isinstance(file, File)
     """
 
     __metaclass__ = _EntryMeta
 
-    HIDDEN = re.compile("^\.")
+    HIDDEN = re.compile('^\.')
 
     def __new__(cls, *args, **kwargs):
         """Returns a file or directory instance."""
@@ -69,7 +68,7 @@ class Entry(object):
         elif os.path.isfile(abspath):
             return File.__new__(File, path, rootdir, autoindex)
         else:
-            raise IOError("'{0}' does not exists.".format(abspath))
+            raise IOError('{0} does not exists.'.format(abspath))
 
     def __init__(self, path, rootdir=None, autoindex=None):
         """Initializes an entry instance."""
@@ -80,7 +79,7 @@ class Entry(object):
             if not autoindex and self.rootdir:
                 self.autoindex = self.rootdir.autoindex
         except AttributeError:
-            rootpath = ""
+            rootpath = ''
         self.path = path
         self.abspath = os.path.join(rootpath, self.path)
         self.name = os.path.basename(self.abspath)
@@ -141,19 +140,19 @@ class Entry(object):
             try:
                 return self.default_icon
             except AttributeError:
-                raise GuessError("There is no matched icon.")
+                raise GuessError('There is no matched icon.')
         try:
-            return urljoin(url_for("silkicon", filename=""), get_icon_url())
-        except AttributeError:
+            return urljoin(url_for('silkicon', filename=''), get_icon_url())
+        except (AttributeError, RuntimeError):
             return get_icon_url()
 
 
 class File(Entry):
     """This class wraps a file."""
 
-    EXTENSION = re.compile("\.([^.]+)$")
+    EXTENSION = re.compile('\.([^.]+)$')
 
-    default_icon = "page_white.png"
+    default_icon = 'page_white.png'
     icon_map = []
 
     def __new__(cls, path, rootdir=None, autoindex=None):
@@ -173,7 +172,7 @@ class File(Entry):
     @cached_property
     def data(self):
         """Data of this file."""
-        return "".join(open(self.abspath).readlines())
+        return ''.join(open(self.abspath).readlines())
 
     @cached_property
     def mimetype(self):
@@ -199,7 +198,7 @@ class File(Entry):
 class Directory(Entry):
     """This class wraps a directory."""
 
-    default_icon = "folder.png"
+    default_icon = 'folder.png'
     icon_map = []
 
     def __new__(cls, *args, **kwargs):
@@ -220,19 +219,19 @@ class Directory(Entry):
             return rootdir
         return object.__new__(cls)
 
-    def explore(self, sort_by="name", order=1, show_hidden=False):
+    def explore(self, sort_by='name', order=1, show_hidden=False):
         """It is a generator. Each item is a child entry."""
         def compare(ent1, ent2):
             def asc():
-                if sort_by != "modified" and type(ent1) is not type(ent2):
+                if sort_by != 'modified' and type(ent1) is not type(ent2):
                     return 1 if type(ent1) is File else -1
                 else:
                     try:
                         return cmp(getattr(ent1, sort_by),
                                    getattr(ent2, sort_by))
                     except AttributeError:
-                        return cmp(getattr(ent1, "name"),
-                                   getattr(ent2, "name"))
+                        return cmp(getattr(ent1, 'name'),
+                                   getattr(ent2, 'name'))
             return asc() * order
         if not self.is_root():
             yield _ParentDirectory(self)
@@ -250,20 +249,20 @@ class Directory(Entry):
     def get_child(self, childname):
         """Returns a child file or directory."""
         if childname in self:
-            if self.path != ".":
+            if self.path != '.':
                 path = os.path.join(self.path, childname)
             else:
                 path = childname
             return Entry(path, self.rootdir)
         else:
-            raise IOError("{0} does not exist".format(childname))
+            raise IOError('{0} does not exist'.format(childname))
 
     def __contains__(self, path_or_entry):
         """Checks this directory has a file or directory.
 
-            public_html = Directory("public_html")
-            "favicon.ico" in public_html
-            File("favicon.ico", public_html) in public_html
+            public_html = Directory('public_html')
+            'favicon.ico' in public_html
+            File('favicon.ico', public_html) in public_html
         """
         if isinstance(path_or_entry, Entry):
             path = os.path.relpath(path_or_entry.path, self.path)
@@ -277,7 +276,7 @@ class Directory(Entry):
 class RootDirectory(Directory):
     """This class wraps a root directory."""
 
-    default_icon = "server.png"
+    default_icon = 'server.png'
     icon_map = []
     _rootdirs = {}
 
@@ -288,7 +287,7 @@ class RootDirectory(Directory):
             return object.__new__(cls)
 
     def __init__(self, path, autoindex=None):
-        super(RootDirectory, self).__init__(".", autoindex=autoindex)
+        super(RootDirectory, self).__init__('.', autoindex=autoindex)
         self.abspath = os.path.abspath(path)
         self.rootdir = self
         self._descendants = {}
@@ -305,14 +304,14 @@ class RootDirectory(Directory):
 class _ParentDirectory(Directory):
     """This class wraps a parent directory."""
 
-    default_icon = "arrow_turn_up.png"
+    default_icon = 'arrow_turn_up.png'
     icon_map = []
 
     def __new__(cls, *args, **kwargs):
         return object.__new__(cls)
 
     def __init__(self, child_directory):
-        path = os.path.join(child_directory.path, "..")
+        path = os.path.join(child_directory.path, '..')
         super(_ParentDirectory, self).__init__(path, child_directory.rootdir)
 
 

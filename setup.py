@@ -12,7 +12,7 @@ awesome! Look at this:
 Links
 `````
 
-* `documentation <http://docs.sublee.kr/flask-autoindex>`_
+* `documentation <http://packages.python.org/Flask-AutoIndex/>`_
 * `development version
   <http://github.com/sublee/flask-autoindex/zipball/master#egg=flask-autoindex-dev>`_
 
@@ -29,33 +29,33 @@ def run_tests():
 
 
 setup(
-    name="Flask-AutoIndex",
-    version="0.3.0",
-    url="http://github.com/sublee/flask-autoindex",
-    license="BSD",
-    author="Heungsub Lee",
-    author_email="h@subl.ee",
-    description="A mod_autoindex for Flask",
+    name='Flask-AutoIndex',
+    version='0.3.1',
+    url='http://github.com/sublee/flask-autoindex',
+    license='BSD',
+    author='Heungsub Lee',
+    author_email='h@subl.ee',
+    description='A mod_autoindex for Flask',
     long_description=__doc__,
-    packages=["flaskext", "flaskext.autoindex"],
+    packages=['flaskext', 'flaskext.autoindex'],
     include_package_data=True,
-    package_data={"flaskext.autoindex": ["static/*", "templates/*"]},
-    namespace_packages=["flaskext"],
+    package_data={'flaskext.autoindex': ['static/*', 'templates/*']},
+    namespace_packages=['flaskext'],
     zip_safe=False,
-    platforms="any",
+    platforms='any',
     install_requires=[
-        "Flask>=0.6",
-        "Flask-Silk"
+        'Flask>=0.7.1',
+        'Flask-Silk'
     ],
-    test_suite="__main__.run_tests",
+    test_suite='__main__.run_tests',
     classifiers=[
-        "Development Status :: 4 - Beta",
-        "Environment :: Web Environment",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Software Development :: Libraries :: Python Modules"
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Software Development :: Libraries :: Python Modules'
     ]
 )
