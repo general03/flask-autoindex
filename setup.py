@@ -30,7 +30,7 @@ def run_tests():
 
 setup(
     name='Flask-AutoIndex',
-    version='0.3.1',
+    version='0.3.2',
     url='http://github.com/sublee/flask-autoindex',
     license='BSD',
     author='Heungsub Lee',
@@ -39,7 +39,8 @@ setup(
     long_description=__doc__,
     packages=['flaskext', 'flaskext.autoindex'],
     include_package_data=True,
-    package_data={'flaskext.autoindex': ['static/*', 'templates/*']},
+    package_data={'flaskext.autoindex': ['static/*',
+                                         'templates/__autoindex__/*']},
     namespace_packages=['flaskext'],
     zip_safe=False,
     platforms='any',

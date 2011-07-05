@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 """
     flaskext.autoindex
     ~~~~~~~~~~~~~~~~~~
 
     A mod_autoindex for `Flask <http://flask.pocoo.org/>`_.
 
-    :copyright: (c) 2010 by Lee Heung-sub.
+    :copyright: (c) 2010-2011 by Heungsub Lee.
     :license: BSD, see LICENSE for more details.
 """
 import os.path
@@ -28,7 +27,7 @@ class AutoIndex(object):
     example::
 
         app = Flask(__name__)
-        idx = AutoIndex(app, '/home/someone/public_html', add_url_rules=True)
+        AutoIndex(app, '/home/someone/public_html', add_url_rules=True)
 
     :param base: a flask application
     :param browse_root: a path which is served by root address.
@@ -44,10 +43,14 @@ class AutoIndex(object):
         """Registers a magic module named __autoindex__."""
         app = app or state.app
         if __autoindex__ not in app.blueprints:
+            static_folder = os.path.join(__path__[0], 'static')
             template_folder = os.path.join(__path__[0], 'templates')
-            type(self).shared = Blueprint(__autoindex__, __name__,
-                                          template_folder=template_folder)
-            app.register_blueprint(type(self).shared)
+            shared = Blueprint(__autoindex__, __name__,
+                               template_folder=template_folder)
+            @shared.route('/__autoindex__/<path:filename>')
+            def static(filename):
+                return send_from_directory(static_folder, filename)
+            app.register_blueprint(shared)
 
     def __new__(cls, base, *args, **kwargs):
         if isinstance(base, Flask):
@@ -76,7 +79,7 @@ class AutoIndex(object):
                 return self.render_autoindex(path)
 
     def render_autoindex(self, path, browse_root=None, template=None,
-                         endpoint='autoindex'):
+                         endpoint='.autoindex'):
         """Renders an autoindex with the given path.
 
         :param path: the relative path
@@ -185,24 +188,13 @@ class AutoIndex(object):
         if callable(rule) or callable(icon):
             Entry.add_icon_rule.im_func(self, icon, rule)
 
-    def send_static_file(self, filename):
-        """Serves a static file. It finds the file from autoindex internal
-        static directory first. If it failed to find the file, it finds from
-        the wrapped application or module's static directory.
-        """
-        global_static = os.path.join(os.path.dirname(__file__), 'static')
-        if os.path.isfile(os.path.join(global_static, filename)):
-            static = global_static
-        else:
-            static = os.path.join(self.base.root_path, 'static')
-        return send_from_directory(static, filename)
-
     @property
     def template_prefix(self):
         raise NotImplementedError()
 
 
 class AutoIndexApplication(AutoIndex):
+    """An AutoIndex which supports flask applications."""
 
     template_prefix = ''
 
@@ -210,18 +202,20 @@ class AutoIndexApplication(AutoIndex):
         super(AutoIndexApplication, self).__init__(app, browse_root,
                                                    **silk_options)
         self.app = app
-        self.app.view_functions['static'] = self.send_static_file
         self._register_shared_autoindex(app=self.app)
 
 
 class AutoIndexBlueprint(AutoIndex):
+    """An AutoIndex which supports flask blueprints.
+
+    .. versionadded:: 0.3.1
+    """
 
     def __init__(self, blueprint, browse_root=None, **silk_options):
         super(AutoIndexBlueprint, self).__init__(blueprint, browse_root,
                                                  **silk_options)
         self.blueprint = self.base
         self.blueprint.record_once(self._register_shared_autoindex)
-        self.blueprint.send_static_file = self.send_static_file
 
     @cached_property
     def template_prefix(self):
@@ -229,6 +223,11 @@ class AutoIndexBlueprint(AutoIndex):
 
 
 class AutoIndexModule(AutoIndexBlueprint):
+    """Deprecated module support.
+
+    .. versionchanged:: 0.3.1
+       ``AutoIndexModule`` was deprecated. Use ``AutoIndexBlueprint`` instead.
+    """
 
     def __init__(self, *args, **kwargs):
         import warnings

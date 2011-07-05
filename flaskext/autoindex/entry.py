@@ -142,7 +142,7 @@ class Entry(object):
             except AttributeError:
                 raise GuessError('There is no matched icon.')
         try:
-            return urljoin(url_for('silkicon', filename=''), get_icon_url())
+            return urljoin(url_for('.silkicon', filename=''), get_icon_url())
         except (AttributeError, RuntimeError):
             return get_icon_url()
 
