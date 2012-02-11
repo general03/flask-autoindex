@@ -33,7 +33,7 @@ class AutoIndex(object):
     :param browse_root: a path which is served by root address.
     :param add_url_rules: if it is ``True``, the wrapped application routes
                           ``/`` and ``/<path:path>`` to autoindex. default
-                          is ``False``.
+                          is ``True``.
     :param **silk_options: keyword options for :class:`flaskext.silk.Silk`
     """
 
