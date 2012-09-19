@@ -1,2 +1,3 @@
+include LICENSE test.py
 recursive-include flaskext/autoindex/static *
 recursive-include flaskext/autoindex/templates *

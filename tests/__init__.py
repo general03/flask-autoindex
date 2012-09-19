@@ -153,7 +153,7 @@ class ApplicationTestCase(unittest.TestCase):
 
     def test_css(self):
         for get in self.get, self.get2:
-            rv = get('/static/autoindex.css')
+            rv = get('/__autoindex__/autoindex.css')
             assert 200 == rv.status_code
 
     def test_icon(self):
