@@ -1,3 +1,5 @@
-include LICENSE test.py
+include LICENSE
+recursive-include tests *
+recursive-exclude tests *.pyc
 recursive-include flaskext/autoindex/static *
 recursive-include flaskext/autoindex/templates *
