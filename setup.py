@@ -17,10 +17,8 @@ Links
   <http://github.com/sublee/flask-autoindex/zipball/master#egg=flask-autoindex-dev>`_
 
 """
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+import re
+from setuptools import setup
 
 
 def run_tests():
@@ -31,10 +29,10 @@ def run_tests():
 setup(
     name='Flask-AutoIndex',
     version='0.4.1',
-    url='http://github.com/sublee/flask-autoindex',
     license='BSD',
     author='Heungsub Lee',
-    author_email='h@subl.ee',
+    author_email=re.sub('((sub).)(.*)', r'\2@\1.\3', 'sublee'),
+    url='http://pythonhosted.org/Flask-AutoIndex',
     description='A mod_autoindex for Flask',
     long_description=__doc__,
     packages=['flaskext', 'flaskext.autoindex'],
@@ -44,10 +42,7 @@ setup(
     namespace_packages=['flaskext'],
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'Flask>=0.7.1',
-        'Flask-Silk'
-    ],
+    install_requires=['Flask>=0.7.1', 'Flask-Silk'],
     test_suite='__main__.run_tests',
     classifiers=[
         'Development Status :: 4 - Beta',

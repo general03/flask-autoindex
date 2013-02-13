@@ -4,7 +4,7 @@
 
     A mod_autoindex for `Flask <http://flask.pocoo.org/>`_.
 
-    :copyright: (c) 2010-2011 by Heungsub Lee.
+    :copyright: (c) 2010-2013 by Heungsub Lee.
     :license: BSD, see LICENSE for more details.
 """
 import os.path
