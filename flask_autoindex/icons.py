@@ -1,4 +1,4 @@
-from flaskext.autoindex.entry import File, Default
+from flask.ext.autoindex.entry import File, Default
 
 
 by_extension = [
