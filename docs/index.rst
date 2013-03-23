@@ -1,7 +1,7 @@
 Flask-AutoIndex
 ~~~~~~~~~~~~~~~
 
-.. module:: flaskext.autoindex
+.. module:: flask_autoindex
 
 Flask-AutoIndex generates an index page for your `Flask`_ application
 automatically. The result just like `mod_autoindex`_, but the look is more
@@ -40,7 +40,7 @@ We will make the application in flask application. There is a basic usage::
 
     import os.path
     from flask import Flask
-    from flaskext.autoindex import AutoIndex
+    from flask.ext.autoindex import AutoIndex
 
     app = Flask(__name__)
     AutoIndex(app, browse_root=os.path.curdir)
