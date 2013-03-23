@@ -3,3 +3,6 @@ recursive-include tests *
 recursive-exclude tests *.pyc
 recursive-include flaskext/autoindex/static *
 recursive-include flaskext/autoindex/templates *
+include docs/*.rst docs/conf.py
+recursive-include docs/_static *
+recursive-include docs/_themes *.py *.css *.css_t *.conf *.html LICENSE README
