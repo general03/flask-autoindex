@@ -2,7 +2,7 @@ import os.path
 import mimetypes
 import unittest
 from flask import *
-from flaskext.autoindex import *
+from flask.ext.autoindex import *
 
 
 __file__ = __file__.replace('.pyc', '.py')

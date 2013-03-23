@@ -1,5 +1,5 @@
 """
-    flaskext.autoindex
+    flask_autoindex
     ~~~~~~~~~~~~~~~~~~
 
     A mod_autoindex for `Flask <http://flask.pocoo.org/>`_.
@@ -12,7 +12,7 @@ import re
 from werkzeug import cached_property
 from jinja2 import FileSystemLoader, TemplateNotFound
 from flask import *
-from flaskext.silk import Silk
+from flask.ext.silk import Silk
 from .entry import *
 from . import icons
 
@@ -34,7 +34,7 @@ class AutoIndex(object):
     :param add_url_rules: if it is ``True``, the wrapped application routes
                           ``/`` and ``/<path:path>`` to autoindex. default
                           is ``True``.
-    :param **silk_options: keyword options for :class:`flaskext.silk.Silk`
+    :param **silk_options: keyword options for :class:`flask.ext.silk.Silk`
     """
 
     shared = None
