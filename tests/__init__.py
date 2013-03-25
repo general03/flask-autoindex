@@ -131,19 +131,13 @@ class ApplicationTestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = Flask(__name__)
-        self.app2 = Flask(__name__ + '2')
+        self.app2 = Flask(__name__)
         self.idx = AutoIndex(self.app, browse_root, add_url_rules=True)
         self.idx2 = AutoIndex(self.app2, silk_path='/myicons')
-        #self.idx3 = AutoIndex()
         @self.app2.route('/')
         @self.app2.route('/<path:path>')
         def autoindex(path='.'):
             return self.idx2.render_autoindex(path, browse_root)
-        #def create_app(__name__):
-        #    app = Flask(__name__)
-        #    self.idx3.init_app(app)
-        #    return app
-        #self.app3 = create_app(__name__ + '3')
 
     def get(self, path):
         return self.app.test_client().get(path)

@@ -1,8 +1,8 @@
 """
     flask_autoindex
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~
 
-    A mod_autoindex for `Flask <http://flask.pocoo.org/>`_.
+    The mod_autoindex for `Flask <http://flask.pocoo.org/>`_.
 
     :copyright: (c) 2010-2013 by Heungsub Lee.
     :license: BSD, see LICENSE for more details.
@@ -17,6 +17,7 @@ from .entry import *
 from . import icons
 
 
+__version__ = '0.5'
 __autoindex__ = '__autoindex__'
 
 

@@ -28,12 +28,12 @@ def run_tests():
 
 setup(
     name='Flask-AutoIndex',
-    version='0.4.1',
+    version='0.5',
     license='BSD',
     author='Heungsub Lee',
     author_email=re.sub('((sub).)(.*)', r'\2@\1.\3', 'sublee'),
     url='http://pythonhosted.org/Flask-AutoIndex',
-    description='A mod_autoindex for Flask',
+    description='The mod_autoindex for Flask',
     long_description=__doc__,
     packages=['flask_autoindex'],
     include_package_data=True,
@@ -41,7 +41,7 @@ setup(
                                       'templates/__autoindex__/*']},
     zip_safe=False,
     platforms='any',
-    install_requires=['Flask>=0.8', 'Flask-Silk'],
+    install_requires=['Flask>=0.8', 'Flask-Silk>=0.2'],
     test_suite='__main__.run_tests',
     classifiers=[
         'Development Status :: 4 - Beta',
