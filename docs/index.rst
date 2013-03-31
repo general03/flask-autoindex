@@ -13,13 +13,18 @@ awesome! Look at this:
 This module contains pre-designed template and css file. It is default
 style, but you can make your own style.
 
-Flask-AutoIndex uses `Flask-Silk`_ to serve icons. Per default, the icons from
-Mark James's `Silk`_ icon set are used.
+.. note::
+    Flask-AutoIndex uses `Flask-Silk`_ to serve icons. Per default, the icons
+    from Mark James's `Silk`_ icon set are used. These icons are licensed
+    under `Creative Commons Attribution 2.5 License <CC-BY-2.5>`_ or
+    `3.0 License <CC-BY-3.0>`_. Before using the icons, read the license.
 
 .. _Flask: http://flask.pocoo.org/
 .. _mod_autoindex: http://httpd.apache.org/docs/current/mod/mod_autoindex.html
 .. _Flask-Silk: http://packages.python.org/Flask-Silk
 .. _Silk: http://www.famfamfam.com/lab/icons/silk/
+.. _CC-BY-2.5: http://creativecommons.org/licenses/by/2.5
+.. _CC-BY-3.0: http://creativecommons.org/licenses/by/3.0
 
 Installation
 ============
