@@ -13,8 +13,13 @@ awesome! Look at this:
 This module contains pre-designed template and css file. It is default
 style, but you can make your own style.
 
+Flask-AutoIndex uses `Flask-Silk`_ to serve icons. Per default, the icons from
+Mark James's `Silk`_ icon set are used.
+
 .. _Flask: http://flask.pocoo.org/
 .. _mod_autoindex: http://httpd.apache.org/docs/current/mod/mod_autoindex.html
+.. _Flask-Silk: http://packages.python.org/Flask-Silk
+.. _Silk: http://www.famfamfam.com/lab/icons/silk/
 
 Installation
 ============
@@ -112,7 +117,7 @@ Now you can get a silk icon from ``http://localhost/myicons/folder.png`` not
 ``http://localhost/__icons__/folder.png``.
 
 .. seealso::
-   The documentation for `Flask-Silk <http://packages.python.org/Flask-Silk>`_
+   The documentation for `Flask-Silk`_
 
 Redesigning the template
 ````````````````````````
