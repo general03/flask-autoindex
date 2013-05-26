@@ -161,6 +161,11 @@ Your templates could extend the default Flask-AutoIndex's template, it named
      </div>
    {% endblock %}
 
+To get extra fields through to your template, pass them in the
+``template_context`` keyword argument::
+
+    AutoIndex(app, template_context = dict(SITENAME = 'My cool site'))
+
 API
 ===
 

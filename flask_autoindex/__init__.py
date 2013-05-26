@@ -62,7 +62,7 @@ class AutoIndex(object):
             raise TypeError("'base' should be Flask or Blueprint.")
 
     def __init__(self, base, browse_root=None, add_url_rules=True,
-                 **silk_options):
+                 template_context={}, **silk_options):
         """Initializes an autoindex instance."""
         self.base = base
         if browse_root:
@@ -73,6 +73,7 @@ class AutoIndex(object):
         self.silk = Silk(self.base, **silk_options)
         self.icon_map = []
         self.converter_map = []
+        self.template_context = template_context
         if add_url_rules:
             @self.base.route('/')
             @self.base.route('/<path:path>')
@@ -80,7 +81,7 @@ class AutoIndex(object):
                 return self.render_autoindex(path)
 
     def render_autoindex(self, path, browse_root=None, template=None,
-                         endpoint='.autoindex'):
+                         template_context = {}, endpoint='.autoindex'):
         """Renders an autoindex with the given path.
 
         :param path: the relative path
@@ -102,7 +103,9 @@ class AutoIndex(object):
             entries = curdir.explore(sort_by=sort_by, order=order)
             if callable(endpoint):
                 endpoint = endpoint.__name__
-            context = dict(curdir=curdir, entries=entries,
+            context = dict(self.template_context.items() +
+                           template_context.items(),
+                           curdir=curdir, entries=entries,
                            sort_by=sort_by, order=order, endpoint=endpoint)
             if template:
                 return render_template(template, **context)
