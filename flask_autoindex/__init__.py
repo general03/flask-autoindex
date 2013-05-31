@@ -30,12 +30,14 @@ class AutoIndex(object):
         app = Flask(__name__)
         AutoIndex(app, '/home/someone/public_html', add_url_rules=True)
 
-    :param base: a flask application
+    :param base: a Flask application.
     :param browse_root: a path which is served by root address.
     :param add_url_rules: if it is ``True``, the wrapped application routes
                           ``/`` and ``/<path:path>`` to autoindex. default
                           is ``True``.
-    :param **silk_options: keyword options for :class:`flask.ext.silk.Silk`
+    :param template_context: would be passed to the Jinja2 template when
+                             rendering an AutoIndex page.
+    :param silk_options: keyword options for :class:`flask.ext.silk.Silk`.
     """
 
     shared = None
@@ -86,11 +88,13 @@ class AutoIndex(object):
                          template_context=None, endpoint='.autoindex'):
         """Renders an autoindex with the given path.
 
-        :param path: the relative path
+        :param path: the relative path.
         :param browse_root: if it is specified, it used to a path which is
                             served by root address.
-        :param template: a template name
-        :param endpoint: an endpoint which is a function
+        :param template: the template name.
+        :param template_context: would be passed to the Jinja2 template when
+                                 rendering an AutoIndex page.
+        :param endpoint: an endpoint which is a function.
         """
         if browse_root:
             rootdir = RootDirectory(browse_root, autoindex=self)
