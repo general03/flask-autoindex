@@ -62,18 +62,20 @@ class AutoIndex(object):
             raise TypeError("'base' should be Flask or Blueprint.")
 
     def __init__(self, base, browse_root=None, add_url_rules=True,
-                 template_context={}, **silk_options):
+                 template_context=None, silk_options=None):
         """Initializes an autoindex instance."""
         self.base = base
         if browse_root:
             self.rootdir = RootDirectory(browse_root, autoindex=self)
         else:
             self.rootdir = None
+        self.template_context = template_context
+        if silk_options is None:
+            silk_options = {}
         silk_options['silk_path'] = silk_options.get('silk_path', '/__icons__')
         self.silk = Silk(self.base, **silk_options)
         self.icon_map = []
         self.converter_map = []
-        self.template_context = template_context
         if add_url_rules:
             @self.base.route('/')
             @self.base.route('/<path:path>')
@@ -81,7 +83,7 @@ class AutoIndex(object):
                 return self.render_autoindex(path)
 
     def render_autoindex(self, path, browse_root=None, template=None,
-                         template_context = {}, endpoint='.autoindex'):
+                         template_context=None, endpoint='.autoindex'):
         """Renders an autoindex with the given path.
 
         :param path: the relative path
@@ -103,10 +105,14 @@ class AutoIndex(object):
             entries = curdir.explore(sort_by=sort_by, order=order)
             if callable(endpoint):
                 endpoint = endpoint.__name__
-            context = dict(self.template_context.items() +
-                           template_context.items(),
-                           curdir=curdir, entries=entries,
-                           sort_by=sort_by, order=order, endpoint=endpoint)
+            context = {}
+            if template_context is not None:
+                context.update(template_context)
+            if self.template_context is not None:
+                context.update(self.template_context)
+            context.update(
+                curdir=curdir, entries=entries,
+                sort_by=sort_by, order=order, endpoint=endpoint)
             if template:
                 return render_template(template, **context)
             try:

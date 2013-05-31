@@ -133,7 +133,8 @@ class ApplicationTestCase(unittest.TestCase):
         self.app = Flask(__name__)
         self.app2 = Flask(__name__)
         self.idx = AutoIndex(self.app, browse_root, add_url_rules=True)
-        self.idx2 = AutoIndex(self.app2, silk_path='/myicons')
+        self.idx2 = AutoIndex(self.app2,
+                              silk_options={'silk_path': '/myicons'})
         @self.app2.route('/')
         @self.app2.route('/<path:path>')
         def autoindex(path='.'):
@@ -146,7 +147,7 @@ class ApplicationTestCase(unittest.TestCase):
         return self.app2.test_client().get(path)
 
     def test_css(self):
-        for get in self.get, self.get2:
+        for get in [self.get, self.get2]:
             rv = get('/__autoindex__/autoindex.css')
             assert 200 == rv.status_code
 
@@ -157,8 +158,8 @@ class ApplicationTestCase(unittest.TestCase):
         assert rv.data == rv2.data
 
     def test_autoindex(self):
-        for get in self.get, self.get2:
-            rv = get('/')
+        for get in [self.get, self.get2]:
+            rv = get('/.')
             assert '__init__.py' in rv.data
 
     def test_own_static_file(self):
@@ -166,7 +167,7 @@ class ApplicationTestCase(unittest.TestCase):
         assert 'Hello, world!' == rv.data.strip()
 
     def test_own_page(self):
-        for get in self.get, self.get2:
+        for get in [self.get, self.get2]:
             rv = get('/test')
             assert not 'foo bar foo bar' == rv.data.strip()
         @self.app.route('/test')
@@ -175,7 +176,7 @@ class ApplicationTestCase(unittest.TestCase):
         @self.app2.route('/test')
         def sublee():
             return 'foo bar foo bar', 200
-        for get in self.get, self.get2:
+        for get in [self.get, self.get2]:
             rv = get('/test')
             assert 'foo bar foo bar' == rv.data.strip()
 
