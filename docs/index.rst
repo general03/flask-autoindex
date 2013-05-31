@@ -226,6 +226,17 @@ Variables
 `endpoint`
     The endpoint which renders a generated page.
 
+Licensing and Author
+====================
+
+This project is licensed under BSD_. See LICENSE_ for the details.
+
+I'm `Heungsub Lee`_. Any regarding questions or patches are welcomed.
+
+.. _BSD: http://en.wikipedia.org/wiki/BSD_licenses
+.. _LICENSE: https://github.com/sublee/flask-autoindex/blob/master/LICENSE
+.. _Heungsub Lee: http://subl.ee/
+
 Indices and tables
 ==================
 
