@@ -88,7 +88,8 @@ class AutoIndex(object):
 
     def render_autoindex(self, path, browse_root=None, template=None,
                          template_context=None, endpoint='.autoindex',
-                         show_hidden=None):
+                         show_hidden=None, sort_by='name',
+                         mimetype=None):
         """Renders an autoindex with the given path.
 
         :param path: the relative path.
@@ -99,6 +100,8 @@ class AutoIndex(object):
                                  rendering an AutoIndex page.
         :param endpoint: an endpoint which is a function.
         :param show_hidden: whether to show hidden files (starting with '.')
+        :param sort_by: the property to sort the entrys by.
+        :param mimetype: set static mime type for files (no auto detection).
         """
         if browse_root:
             rootdir = RootDirectory(browse_root, autoindex=self)
@@ -107,7 +110,7 @@ class AutoIndex(object):
         path = re.sub(r'\/*$', '', path)
         abspath = os.path.join(rootdir.abspath, path)
         if os.path.isdir(abspath):
-            sort_by = request.args.get('sort_by', 'name')
+            sort_by = request.args.get('sort_by', sort_by)
             order = {'asc': 1, 'desc': -1}[request.args.get('order', 'asc')]
             curdir = Directory(path, rootdir)
             if show_hidden == None: show_hidden = self.show_hidden
@@ -132,7 +135,10 @@ class AutoIndex(object):
                 template = '{0}/autoindex.html'.format(__autoindex__)
                 return render_template(template, **context)
         elif os.path.isfile(abspath):
-            return send_file(abspath)
+            if mimetype:
+                return send_file(abspath, mimetype=mimetype)
+            else:
+                return send_file(abspath)
         else:
             return abort(404)
 
