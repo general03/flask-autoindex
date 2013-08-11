@@ -64,7 +64,8 @@ class AutoIndex(object):
             raise TypeError("'base' should be Flask or Blueprint.")
 
     def __init__(self, base, browse_root=None, add_url_rules=True,
-                 template_context=None, silk_options=None):
+                 template_context=None, silk_options=None,
+                 show_hidden=False):
         """Initializes an autoindex instance."""
         self.base = base
         if browse_root:
@@ -76,6 +77,7 @@ class AutoIndex(object):
             silk_options = {}
         silk_options['silk_path'] = silk_options.get('silk_path', '/__icons__')
         self.silk = Silk(self.base, **silk_options)
+        self.show_hidden = show_hidden
         self.icon_map = []
         self.converter_map = []
         if add_url_rules:
@@ -85,7 +87,9 @@ class AutoIndex(object):
                 return self.render_autoindex(path)
 
     def render_autoindex(self, path, browse_root=None, template=None,
-                         template_context=None, endpoint='.autoindex'):
+                         template_context=None, endpoint='.autoindex',
+                         show_hidden=None, sort_by='name',
+                         mimetype=None):
         """Renders an autoindex with the given path.
 
         :param path: the relative path.
@@ -95,6 +99,9 @@ class AutoIndex(object):
         :param template_context: would be passed to the Jinja2 template when
                                  rendering an AutoIndex page.
         :param endpoint: an endpoint which is a function.
+        :param show_hidden: whether to show hidden files (starting with '.')
+        :param sort_by: the property to sort the entrys by.
+        :param mimetype: set static mime type for files (no auto detection).
         """
         if browse_root:
             rootdir = RootDirectory(browse_root, autoindex=self)
@@ -103,10 +110,12 @@ class AutoIndex(object):
         path = re.sub(r'\/*$', '', path)
         abspath = os.path.join(rootdir.abspath, path)
         if os.path.isdir(abspath):
-            sort_by = request.args.get('sort_by', 'name')
+            sort_by = request.args.get('sort_by', sort_by)
             order = {'asc': 1, 'desc': -1}[request.args.get('order', 'asc')]
             curdir = Directory(path, rootdir)
-            entries = curdir.explore(sort_by=sort_by, order=order)
+            if show_hidden == None: show_hidden = self.show_hidden
+            entries = curdir.explore(sort_by=sort_by, order=order,
+                                     show_hidden=show_hidden)
             if callable(endpoint):
                 endpoint = endpoint.__name__
             context = {}
@@ -126,7 +135,10 @@ class AutoIndex(object):
                 template = '{0}/autoindex.html'.format(__autoindex__)
                 return render_template(template, **context)
         elif os.path.isfile(abspath):
-            return send_file(abspath)
+            if mimetype:
+                return send_file(abspath, mimetype=mimetype)
+            else:
+                return send_file(abspath)
         else:
             return abort(404)
 
