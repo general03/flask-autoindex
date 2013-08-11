@@ -1,4 +1,7 @@
-from flask.ext.autoindex.entry import File, Default
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
+from .entry import File, Default
 
 
 by_extension = [

@@ -1,12 +1,20 @@
-import os.path
 import mimetypes
+import os
+import sys
 import unittest
+
 from flask import *
 from flask.ext.autoindex import *
 
 
 __file__ = __file__.replace('.pyc', '.py')
 browse_root = os.path.abspath(os.path.dirname(__file__))
+
+
+if sys.version_info < (3,):
+    b = lambda s: s
+else:
+    b = lambda s: bytes(s, 'ascii')
 
 
 class RootDirectoryTestCase(unittest.TestCase):
@@ -120,7 +128,8 @@ class FileTestCase(unittest.TestCase):
                Entry('__init__.py', self.rootdir)
 
     def test_properties(self):
-        source = ''.join(file(__file__).readlines())
+        with open(__file__) as f:
+            source = ''.join(f.readlines())
         assert self.itself.data.strip() == source.strip()
         assert self.itself.size == len(source)
         assert self.itself.ext == 'py'
@@ -159,17 +168,17 @@ class ApplicationTestCase(unittest.TestCase):
         assert rv.data == rv2.data
 
     def test_autoindex(self):
-        assert '__init__.py' in self.get('/').data
-        assert '__init__.py' in self.get2('/').data
+        assert b('__init__.py') in self.get('/').data
+        assert b('__init__.py') in self.get2('/').data
 
     def test_own_static_file(self):
         rv = self.get('/static/helloworld.txt')
-        assert 'Hello, world!' == rv.data.strip()
+        assert b('Hello, world!') == rv.data.strip()
 
     def test_own_page(self):
         for get in [self.get, self.get2]:
             rv = get('/test')
-            assert not 'foo bar foo bar' == rv.data.strip()
+            assert not b('foo bar foo bar') == rv.data.strip()
         @self.app.route('/test')
         def sublee():
             return 'foo bar foo bar', 200
@@ -178,7 +187,7 @@ class ApplicationTestCase(unittest.TestCase):
             return 'foo bar foo bar', 200
         for get in [self.get, self.get2]:
             rv = get('/test')
-            assert 'foo bar foo bar' == rv.data.strip()
+            assert b('foo bar foo bar') == rv.data.strip()
 
     def test_builtin_icon_rule(self):
         testset = {'7z': 'page_white_zip.png',
@@ -187,17 +196,19 @@ class ApplicationTestCase(unittest.TestCase):
                    'html': 'page_white_code.png',
                    'iso': 'cd.png',
                    'rss': 'feed.png'}
-        for ext, icon in testset.iteritems():
-            file = self.idx.rootdir.get_child('static/test.' + ext)
-            assert file.guess_icon().endswith(icon)
+        with self.app.test_request_context():
+            for ext, icon in testset.items():
+                file = self.idx.rootdir.get_child('static/test.' + ext)
+                assert file.guess_icon().endswith(icon)
 
     def test_custom_icon_rule(self):
-        file = self.idx.rootdir.get_child('__init__.py')
-        original_icon_url = file.guess_icon()
-        self.idx.add_icon_rule('table.png', ext='py')
-        customized_icon_url = file.guess_icon()
-        assert original_icon_url.endswith('page_white_python.png')
-        assert customized_icon_url.endswith('table.png')
+        with self.app.test_request_context():
+            file = self.idx.rootdir.get_child('__init__.py')
+            original_icon_url = file.guess_icon()
+            self.idx.add_icon_rule('table.png', ext='py')
+            customized_icon_url = file.guess_icon()
+            assert original_icon_url.endswith('page_white_python.png')
+            assert customized_icon_url.endswith('table.png')
 
 
 class SubdomainTestCase(unittest.TestCase):

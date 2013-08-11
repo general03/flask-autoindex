@@ -1,11 +1,16 @@
-import os.path
-import re
-from urlparse import urljoin
+# -*- coding: utf-8 -*-
 from datetime import datetime
-from mimetypes import guess_type
 from fnmatch import fnmatch
-from werkzeug import cached_property
+from mimetypes import guess_type
+import os
+import re
+try:
+    from urlparse import urljoin
+except ImportError:
+    from urllib.parse import urljoin
+
 from flask import url_for, send_file
+from werkzeug import cached_property
 
 
 Default = None
@@ -144,6 +149,7 @@ class Entry(object):
         try:
             return urljoin(url_for('.silkicon', filename=''), get_icon_url())
         except (AttributeError, RuntimeError):
+            return 'ERROR'
             return get_icon_url()
 
 
@@ -172,7 +178,8 @@ class File(Entry):
     @cached_property
     def data(self):
         """Data of this file."""
-        return ''.join(open(self.abspath).readlines())
+        with open(self.abspath) as f:
+            return ''.join(f.readlines())
 
     @cached_property
     def mimetype(self):

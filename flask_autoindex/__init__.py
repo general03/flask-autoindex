@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     flask_autoindex
     ~~~~~~~~~~~~~~~
@@ -7,12 +8,16 @@
     :copyright: (c) 2010-2013 by Heungsub Lee.
     :license: BSD, see LICENSE for more details.
 """
-import os.path
+from __future__ import absolute_import
+import os
 import re
-from werkzeug import cached_property
-from jinja2 import FileSystemLoader, TemplateNotFound
+import sys
+
 from flask import *
 from flask.ext.silk import Silk
+from jinja2 import FileSystemLoader, TemplateNotFound
+from werkzeug import cached_property
+
 from .entry import *
 from . import icons
 
@@ -201,18 +206,22 @@ class AutoIndex(object):
         if name:
             filename = name
             directoryname = name
+        if sys.version_info < (3,):
+            call = lambda m, *args: m.im_func(self, *args)
+        else:
+            call = lambda m, *args: m.__func__(self, *args)
         if ext:
-            File.add_icon_rule_by_ext.im_func(self, icon, ext)
+            call(File.add_icon_rule_by_ext, icon, ext)
         if mimetype:
-            File.add_icon_rule_by_mimetype.im_func(self, icon, mimetype)
+            call(File.add_icon_rule_by_mimetype, icon, mimetype)
         if filename:
-            File.add_icon_rule_by_name.im_func(self, icon, filename)
+            call(File.add_icon_rule_by_name, icon, filename)
         if dirname:
-            Directory.add_icon_rule_by_name.im_func(self, icon, dirname)
+            call(Directory.add_icon_rule_by_name, icon, dirname)
         if cls:
-            Entry.add_icon_rule_by_class.im_func(self, icon, cls)
+            call(Entry.add_icon_rule_by_class, icon, cls)
         if callable(rule) or callable(icon):
-            Entry.add_icon_rule.im_func(self, icon, rule)
+            call(Entry.add_icon_rule, icon, rule)
 
     @property
     def template_prefix(self):
