@@ -133,17 +133,18 @@ class ApplicationTestCase(unittest.TestCase):
         self.app = Flask(__name__)
         self.app2 = Flask(__name__)
         self.idx = AutoIndex(self.app, browse_root, add_url_rules=True)
-        self.idx2 = AutoIndex(self.app2,
+        self.idx2 = AutoIndex(self.app2, browse_root,
                               silk_options={'silk_path': '/myicons'})
         @self.app2.route('/')
         @self.app2.route('/<path:path>')
-        def autoindex(path='.'):
+        def autoindex_test(path='.'):
             return self.idx2.render_autoindex(path, browse_root)
 
     def get(self, path):
         return self.app.test_client().get(path)
 
     def get2(self, path):
+        self.app2.config['TESTING'] = True
         return self.app2.test_client().get(path)
 
     def test_css(self):
@@ -158,9 +159,8 @@ class ApplicationTestCase(unittest.TestCase):
         assert rv.data == rv2.data
 
     def test_autoindex(self):
-        for get in [self.get, self.get2]:
-            rv = get('/.')
-            assert '__init__.py' in rv.data
+        assert '__init__.py' in self.get('/').data
+        assert '__init__.py' in self.get2('/').data
 
     def test_own_static_file(self):
         rv = self.get('/static/helloworld.txt')
