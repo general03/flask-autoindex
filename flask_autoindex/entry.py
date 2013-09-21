@@ -16,6 +16,9 @@ from werkzeug import cached_property
 Default = None
 
 
+is_same_path = lambda x, y: os.stat(x) == os.stat(y)
+
+
 def _make_mimetype_matcher(mimetype):
     return lambda ent: fnmatch(guess_type(ent.name)[0] or '', mimetype)
 
@@ -100,8 +103,7 @@ class Entry(object):
     def parent(self):
         if self.is_root():
             return None
-        elif os.path.samefile(os.path.dirname(self.abspath),
-                              self.rootdir.abspath):
+        elif is_same_path(os.path.dirname(self.abspath), self.rootdir.abspath):
             return self.rootdir
         return Entry(os.path.dirname(self.path), self.rootdir)
 
@@ -220,7 +222,7 @@ class Directory(Entry):
         except KeyError:
             pass
         rootpath = rootdir.abspath
-        if os.path.samefile(os.path.join(rootpath, path), rootpath):
+        if is_same_path(os.path.join(rootpath, path), rootpath):
             if not rootdir:
                 rootdir = RootDirectory(rootpath, autoindex)
             return rootdir
