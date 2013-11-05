@@ -247,9 +247,13 @@ class Directory(Entry):
             rootdir = self.rootdir
         else:
             rootdir = self
-        entries = os.listdir(self.abspath)
-        entries = (Entry(os.path.join(self.path, name), rootdir) \
-                   for name in entries)
+        dirlist = os.listdir(self.abspath)
+        entries = []
+        for name in dirlist:
+            try:
+                entries.append(Entry(os.path.join(self.path, name), rootdir))
+            except IOError:
+                continue  # ignore stuff like broken links
         entries = sorted(entries, cmp=compare)
         for ent in entries:
             if show_hidden or not ent.hidden:
