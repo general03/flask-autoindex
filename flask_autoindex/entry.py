@@ -162,6 +162,7 @@ class File(Entry):
 
     default_icon = 'page_white.png'
     icon_map = []
+    isdir=False
 
     def __new__(cls, path, rootdir=None, autoindex=None):
         try:
@@ -209,6 +210,7 @@ class Directory(Entry):
 
     default_icon = 'folder.png'
     icon_map = []
+    isdir=True
 
     def __new__(cls, *args, **kwargs):
         """If the path is same with root path, it returns a

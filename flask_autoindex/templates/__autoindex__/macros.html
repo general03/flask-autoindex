@@ -18,7 +18,7 @@
       <time datetime="{{ ent.modified }}">{{ ent.modified }}</time>
     </td>
     <td class="size">
-      {% if ent.size %}
+      {% if not ent.isdir %}
         {{ ent.size|filesizeformat }}
       {% else %}
         -
