@@ -62,6 +62,9 @@ We will make the application in flask application. There is a basic usage::
 After running the application, ``http://localhost/`` serves a generated index
 page which contains the file and directory list in current directory.
 
+Or, use a shipped console script. Just type ``fai`` in command line.
+(yes, ``fai`` is an acronym of Flask-AutoIndex)
+
 Customizing
 ===========
 
