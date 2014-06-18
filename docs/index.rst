@@ -71,7 +71,7 @@ Customizing
 Routing a specified URL
 ```````````````````````
 
-Just like a nomal flask application or module. Follow the below example::
+Just like a normal flask application or module. Follow the below example::
 
     @app.route('/helloworld')
     def helloworld():
