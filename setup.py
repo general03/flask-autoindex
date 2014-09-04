@@ -41,7 +41,7 @@ setup(
                                       'templates/__autoindex__/*']},
     zip_safe=False,
     platforms='any',
-    install_requires=['Flask>=0.8', 'Flask-Silk>=0.2'],
+    install_requires=['Flask>=0.8', 'Flask-Silk>=0.2', 'future>=0.13.0'],
     test_suite='__main__.run_tests',
     classifiers=[
         'Development Status :: 4 - Beta',

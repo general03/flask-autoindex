@@ -1,3 +1,6 @@
+from past.builtins import cmp
+from future import standard_library
+standard_library.install_hooks()
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from fnmatch import fnmatch
@@ -5,11 +8,8 @@ from mimetypes import guess_type
 import functools
 import os
 import re
-try:
-    from urlparse import urljoin
-except ImportError:
-    from urllib.parse import urljoin
-
+from future.utils import with_metaclass
+from future.moves.urllib.parse import urljoin
 from flask import url_for, send_file
 from werkzeug import cached_property
 
@@ -51,7 +51,7 @@ class _EntryMeta(type):
         return ent
 
 
-class Entry(object):
+class Entry(with_metaclass(_EntryMeta, object)):
     """This class wraps file or directory. It is an abstract class, but it
     returns a derived instance. You can make an instance such as::
 
@@ -60,8 +60,6 @@ class Entry(object):
         file = Entry('/home/someone/public_html/favicon.ico')
         assert isinstance(file, File)
     """
-
-    __metaclass__ = _EntryMeta
 
     HIDDEN = re.compile('^\.')
 
@@ -231,9 +229,6 @@ class Directory(Entry):
 
     def explore(self, sort_by='name', order=1, show_hidden=False):
         """It is a generator. Each item is a child entry."""
-        def cmp(a, b):
-            """ the cmp function was removed in Py3.0 """
-            return (a > b) - (a < b)
 
         def compare(ent1, ent2):
             def asc():
