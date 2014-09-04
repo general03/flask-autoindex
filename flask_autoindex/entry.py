@@ -2,6 +2,7 @@
 from datetime import datetime
 from fnmatch import fnmatch
 from mimetypes import guess_type
+import functools
 import os
 import re
 try:
@@ -230,6 +231,10 @@ class Directory(Entry):
 
     def explore(self, sort_by='name', order=1, show_hidden=False):
         """It is a generator. Each item is a child entry."""
+        def cmp(a, b):
+            """ the cmp function was removed in Py3.0 """
+            return (a > b) - (a < b)
+
         def compare(ent1, ent2):
             def asc():
                 if sort_by != 'modified' and type(ent1) is not type(ent2):
@@ -254,7 +259,7 @@ class Directory(Entry):
                 entries.append(Entry(os.path.join(self.path, name), rootdir))
             except IOError:
                 continue  # ignore stuff like broken links
-        entries = sorted(entries, cmp=compare)
+        entries = sorted(entries, key=functools.cmp_to_key(compare))
         for ent in entries:
             if show_hidden or not ent.hidden:
                 yield ent
