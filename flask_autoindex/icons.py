@@ -64,7 +64,7 @@ by_mimetype = [
 
 
 def to_list(val):
-    if not getattr(val, '__iter__', False):
+    if not isinstance(val, list):
         return [val]
     else:
         return val
