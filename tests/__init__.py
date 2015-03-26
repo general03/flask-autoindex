@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from future.builtins import bytes
 import mimetypes
 import os
 import sys
@@ -168,6 +170,7 @@ class ApplicationTestCase(unittest.TestCase):
         assert rv.data == rv2.data
 
     def test_autoindex(self):
+
         assert b('__init__.py') in self.get('/').data
         assert b('__init__.py') in self.get2('/').data
 
@@ -197,7 +200,7 @@ class ApplicationTestCase(unittest.TestCase):
                    'iso': 'cd.png',
                    'rss': 'feed.png'}
         with self.app.test_request_context():
-            for ext, icon in testset.items():
+            for ext, icon in list(testset.items()):
                 file = self.idx.rootdir.get_child('static/test.' + ext)
                 assert file.guess_icon().endswith(icon)
 
@@ -214,7 +217,7 @@ class ApplicationTestCase(unittest.TestCase):
 class SubdomainTestCase(unittest.TestCase):
 
     def setUp(self):
-        from blueprinttest import bp
+        from .blueprinttest import bp
         app = Flask(__name__)
         app.config['SERVER_NAME'] = 'example.org'
         AutoIndex(bp, browse_root)
@@ -245,7 +248,7 @@ class SubdomainTestCase(unittest.TestCase):
 class WithoutSubdomainTestCase(unittest.TestCase):
 
     def setUp(self):
-        from blueprinttest import bp
+        from .blueprinttest import bp
         app = Flask(__name__)
         AutoIndex(bp, browse_root)
         app.register_blueprint(bp)

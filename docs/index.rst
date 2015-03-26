@@ -62,13 +62,19 @@ We will make the application in flask application. There is a basic usage::
 After running the application, ``http://localhost/`` serves a generated index
 page which contains the file and directory list in current directory.
 
+Or, use a shipped console script. Just type ``fai`` in command line.
+(yes, ``fai`` is an acronym of Flask-AutoIndex)::
+
+    $ fai
+     * Running on http://127.0.0.1:5000/
+
 Customizing
 ===========
 
 Routing a specified URL
 ```````````````````````
 
-Just like a nomal flask application or module. Follow the below example::
+Just like a normal flask application or module. Follow the below example::
 
     @app.route('/helloworld')
     def helloworld():

@@ -9,9 +9,10 @@
     :license: BSD, see LICENSE for more details.
 """
 from __future__ import absolute_import
+from future.builtins import str
+from future.builtins import object
 import os
 import re
-import sys
 
 from flask import *
 from flask.ext.silk import Silk
@@ -74,6 +75,7 @@ class AutoIndex(object):
         """Initializes an autoindex instance."""
         self.base = base
         if browse_root:
+            browse_root = str(browse_root)
             self.rootdir = RootDirectory(browse_root, autoindex=self)
         else:
             self.rootdir = None
@@ -150,7 +152,7 @@ class AutoIndex(object):
     def add_icon_rule(self, icon, rule=None, ext=None, mimetype=None,
                       name=None, filename=None, dirname=None, cls=None):
         """Adds a new icon rule.
-        
+
         There are many shortcuts for rule. You can use one or more shortcuts in
         a rule.
 
@@ -206,10 +208,7 @@ class AutoIndex(object):
         if name:
             filename = name
             directoryname = name
-        if sys.version_info < (3,):
-            call = lambda m, *args: m.im_func(self, *args)
-        else:
-            call = lambda m, *args: m.__func__(self, *args)
+        call = lambda m, *args: m.__func__(self, *args)
         if ext:
             call(File.add_icon_rule_by_ext, icon, ext)
         if mimetype:
