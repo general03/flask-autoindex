@@ -78,9 +78,9 @@ class AutoIndex(object):
         self.base = base
         if browse_root:
             browse_root = str(browse_root)
-            self.rootdir = RootDirectory(browse_root, autoindex=self)
         else:
-            self.rootdir = os.path.curdir
+            browse_root = os.path.curdir
+        self.rootdir = RootDirectory(browse_root, autoindex=self)
         self.template_context = template_context
         if silk_options is None:
             silk_options = {}
