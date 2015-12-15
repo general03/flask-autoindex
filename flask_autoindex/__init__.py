@@ -37,7 +37,9 @@ class AutoIndex(object):
         AutoIndex(app, '/home/someone/public_html', add_url_rules=True)
 
     :param base: a Flask application.
-    :param browse_root: a path which is served by root address.
+    :param browse_root: a path which is served by root address. By default,
+                        this is the working directory, but you can set it to
+                        fix your app to always use one location if you like.
     :param add_url_rules: if it is ``True``, the wrapped application routes
                           ``/`` and ``/<path:path>`` to autoindex. default
                           is ``True``.
@@ -78,7 +80,7 @@ class AutoIndex(object):
             browse_root = str(browse_root)
             self.rootdir = RootDirectory(browse_root, autoindex=self)
         else:
-            self.rootdir = None
+            self.rootdir = os.path.curdir
         self.template_context = template_context
         if silk_options is None:
             silk_options = {}
