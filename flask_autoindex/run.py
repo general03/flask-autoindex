@@ -1,6 +1,6 @@
 import os.path
 from flask import Flask
-from flask.ext.autoindex import AutoIndex
+from flask_autoindex import AutoIndex
 
 
 app = Flask(__name__)

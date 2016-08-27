@@ -6,7 +6,7 @@ import sys
 import unittest
 
 from flask import *
-from flask.ext.autoindex import *
+from flask_autoindex import *
 
 
 __file__ = __file__.replace('.pyc', '.py')
