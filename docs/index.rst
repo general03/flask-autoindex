@@ -51,7 +51,7 @@ We will make the application in flask application. There is a basic usage::
 
     import os.path
     from flask import Flask
-    from flask.ext.autoindex import AutoIndex
+    from flask_autoindex import AutoIndex
 
     app = Flask(__name__)
     AutoIndex(app, browse_root=os.path.curdir)

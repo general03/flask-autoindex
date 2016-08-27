@@ -15,7 +15,7 @@ import os
 import re
 
 from flask import *
-from flask.ext.silk import Silk
+from flask_silk import Silk
 from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug import cached_property
 
@@ -45,7 +45,7 @@ class AutoIndex(object):
                           is ``True``.
     :param template_context: would be passed to the Jinja2 template when
                              rendering an AutoIndex page.
-    :param silk_options: keyword options for :class:`flask.ext.silk.Silk`.
+    :param silk_options: keyword options for :class:`flask_silk.Silk`.
     """
 
     shared = None
