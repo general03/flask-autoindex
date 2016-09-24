@@ -55,7 +55,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'fai = flask_autoindex.run:run',
+            'fai = flask_autoindex.run:app.run',
         ],
     },
 )
