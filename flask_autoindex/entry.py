@@ -14,7 +14,6 @@ from flask import url_for, send_file
 from werkzeug import cached_property
 
 
-NT_OS = os.name.lower() == 'nt'
 Default = None
 
 
@@ -252,10 +251,7 @@ class Directory(Entry):
         entries = []
         for name in dirlist:
             try:
-                if NT_OS:
-                    entries.append(Entry(os.path.join(self.path, name).replace('\\', '/'), rootdir))
-                else:
-                    entries.append(Entry(os.path.join(self.path, name), rootdir))
+                entries.append(Entry(os.path.join(self.path, name).replace(os.path.sep, '/'), rootdir))
             except IOError:
                 continue  # ignore stuff like broken links
         entries = sorted(entries, key=functools.cmp_to_key(compare))
@@ -328,10 +324,7 @@ class _ParentDirectory(Directory):
         return object.__new__(cls)
 
     def __init__(self, child_directory):
-        if NT_OS:
-            path = os.path.join(child_directory.path, '..').replace('\\', '/')
-        else:
-            path = os.path.join(child_directory.path, '..')
+        path = os.path.join(child_directory.path, '..').replace(os.path.sep, '/')
         super(_ParentDirectory, self).__init__(path, child_directory.rootdir)
 
 
