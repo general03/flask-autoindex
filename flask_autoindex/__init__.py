@@ -23,7 +23,7 @@ from .entry import *
 from . import icons
 
 
-__version__ = '0.5'
+__version__ = '0.6.1'
 __autoindex__ = '__autoindex__'
 
 
