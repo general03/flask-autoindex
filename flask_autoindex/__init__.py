@@ -118,6 +118,14 @@ class AutoIndex(object):
             rootdir = self.rootdir
         path = re.sub(r'\/*$', '', path)
         abspath = os.path.join(rootdir.abspath, path)
+
+        # Disallow to access to an upper path.
+        # This issue was reported by @r4dian.
+        # https://github.com/sublee/flask-autoindex/issues/18
+        relpath = os.path.relpath(abspath, rootdir.abspath)
+        if relpath.startswith(os.path.pardir):
+            return abort(403)
+
         if os.path.isdir(abspath):
             sort_by = request.args.get('sort_by', sort_by)
             order = {'asc': 1, 'desc': -1}[request.args.get('order', 'asc')]
