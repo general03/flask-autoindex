@@ -213,6 +213,12 @@ class ApplicationTestCase(unittest.TestCase):
             assert original_icon_url.endswith('page_white_python.png')
             assert customized_icon_url.endswith('table.png')
 
+    def test_parent_of_root(self):
+        with self.app.test_request_context():
+            assert self.get('.').status_code == 200
+            assert self.get('..').status_code == 403
+            assert self.get('../..').status_code == 403
+
 
 class SubdomainTestCase(unittest.TestCase):
 
