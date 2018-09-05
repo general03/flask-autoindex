@@ -28,7 +28,7 @@ def run_tests():
 
 setup(
     name='Flask-AutoIndex',
-    version='0.6.1',
+    version='0.6.2',
     license='BSD',
     author='Heungsub Lee',
     author_email=re.sub('((sub).)(.*)', r'\2@\1.\3', 'sublee'),
