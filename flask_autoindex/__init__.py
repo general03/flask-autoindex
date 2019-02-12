@@ -58,6 +58,7 @@ class AutoIndex(object):
             template_folder = os.path.join(__path__[0], 'templates')
             shared = Blueprint(__autoindex__, __name__,
                                template_folder=template_folder)
+
             @shared.route('/__autoindex__/<path:filename>')
             def static(filename):
                 return send_from_directory(static_folder, filename)
@@ -128,9 +129,15 @@ class AutoIndex(object):
 
         if os.path.isdir(abspath):
             sort_by = request.args.get('sort_by', sort_by)
-            order = {'asc': 1, 'desc': -1}[request.args.get('order', 'asc')]
+            if sort_by[0] in ['-', '+']:
+                order = {'+': 1, '-': -1}[sort_by[0]]
+                sort_by = sort_by[1::]
+            else:
+                order = {'asc': 1, 'desc': -
+                         1}[request.args.get('order', 'asc')]
             curdir = Directory(path, rootdir)
-            if show_hidden == None: show_hidden = self.show_hidden
+            if show_hidden == None:
+                show_hidden = self.show_hidden
             entries = curdir.explore(sort_by=sort_by, order=order,
                                      show_hidden=show_hidden)
             if callable(endpoint):
@@ -275,7 +282,7 @@ class AutoIndexModule(AutoIndexBlueprint):
 
     def __init__(self, *args, **kwargs):
         import warnings
-        warnings.warn('AutoIndexModule is deprecated; ' \
+        warnings.warn('AutoIndexModule is deprecated; '
                       'use AutoIndexBlueprint instead.', DeprecationWarning)
         super(AutoIndexModule, self).__init__(*args, **kwargs)
 
