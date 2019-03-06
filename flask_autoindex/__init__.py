@@ -98,7 +98,7 @@ class AutoIndex(object):
 
     def render_autoindex(self, path, browse_root=None, template=None,
                          template_context=None, endpoint='.autoindex',
-                         show_hidden=None, sort_by='name',
+                         show_hidden=None, sort_by='name', order=1,
                          mimetype=None):
         """Renders an autoindex with the given path.
 
@@ -129,12 +129,7 @@ class AutoIndex(object):
 
         if os.path.isdir(abspath):
             sort_by = request.args.get('sort_by', sort_by)
-            if sort_by[0] in ['-', '+']:
-                order = {'+': 1, '-': -1}[sort_by[0]]
-                sort_by = sort_by[1::]
-            else:
-                order = {'asc': 1, 'desc': -
-                         1}[request.args.get('order', 'asc')]
+            order = {'asc': 1, 'desc': -1, 'default': order}[request.args.get('order', 'default')]
             curdir = Directory(path, rootdir)
             if show_hidden == None:
                 show_hidden = self.show_hidden
