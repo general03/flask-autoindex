@@ -74,7 +74,7 @@ class AutoIndex(object):
 
     def __init__(self, base, browse_root=None, add_url_rules=True,
                  template_context=None, silk_options=None,
-                 show_hidden=False):
+                 show_hidden=False, sort_by='name', order=1):
         """Initializes an autoindex instance."""
         self.base = base
         if browse_root:
@@ -94,7 +94,7 @@ class AutoIndex(object):
             @self.base.route('/')
             @self.base.route('/<path:path>')
             def autoindex(path='.'):
-                return self.render_autoindex(path)
+                return self.render_autoindex(path, sort_by=sort_by, order=order)
 
     def render_autoindex(self, path, browse_root=None, template=None,
                          template_context=None, endpoint='.autoindex',
