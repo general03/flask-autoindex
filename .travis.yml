@@ -1,5 +1,14 @@
+dist: xenial
 language: python
 
+python:
+  - "3.5"
+  - "3.6"
+  - "3.7"
+
+virtualenv:
+  system_site_packages: true
+  
 env:
   global:
     - CC_TEST_REPORTER_ID=$CODECLIMATE_REPORTER_ID
@@ -9,10 +18,6 @@ env:
     - NAME_REPO=$NAME_REPO
     - GH_REPO="github.com/${GH_COMPANY}/${NAME_REPO}.git"
 
-python:
-  - "3.5"
-  - "3.6"
-  - "3.7"
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
