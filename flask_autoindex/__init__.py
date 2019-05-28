@@ -1,29 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-    flask_autoindex
-    ~~~~~~~~~~~~~~~
-
-    The mod_autoindex for `Flask <http://flask.pocoo.org/>`_.
-
-    :copyright: (c) 2010-2013 by Heungsub Lee.
-    :license: BSD, see LICENSE for more details.
-"""
 from __future__ import absolute_import
-from future.builtins import str
-from future.builtins import object
+
 import os
 import re
 
 from flask import *
 from flask_silk import Silk
+from future.builtins import object, str
 from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug import cached_property
 
-from .entry import *
 from . import icons
+from .entry import *
 
-
-__version__ = '0.6.2'
+__version__ = '0.6.3'
 __autoindex__ = '__autoindex__'
 
 
@@ -129,7 +118,11 @@ class AutoIndex(object):
 
         if os.path.isdir(abspath):
             sort_by = request.args.get('sort_by', sort_by)
-            order = {'asc': 1, 'desc': -1, 'default': order}[request.args.get('order', 'default')]
+            if sort_by[0] in ['-', '+']:
+                order = {'+': 1, '-': -1}[sort_by[0]]
+                sort_by = sort_by[1::]
+            else:
+                order = {'asc': 1, 'desc': -1}[request.args.get('order', 'asc')]
             curdir = Directory(path, rootdir)
             if show_hidden == None:
                 show_hidden = self.show_hidden

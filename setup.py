@@ -18,6 +18,7 @@ Links
 
 """
 import re
+
 from setuptools import setup
 
 
@@ -28,10 +29,9 @@ def run_tests():
 
 setup(
     name='Flask-AutoIndex',
-    version='0.6.2',
+    version='0.6.3',
     license='BSD',
-    author='Heungsub Lee',
-    author_email=re.sub('((sub).)(.*)', r'\2@\1.\3', 'sublee'),
+    author='RIGAUDIE David',
     url='http://pythonhosted.org/Flask-AutoIndex',
     description='The mod_autoindex for Flask',
     long_description=__doc__,
