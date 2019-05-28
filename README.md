@@ -1,14 +1,17 @@
 Flask-AutoIndex
 
-A mod_autoindex for Flask. Under development.
+A mod_autoindex for Flask
 
-### Usage
+## Requirements
+
+* Flask
+* Python 3
+
+## Usage
 
 ```
 import os.path
 from flask import Flask
-
-import flask_silk
 from flask_autoindex import AutoIndex
 
 app = Flask(__name__)

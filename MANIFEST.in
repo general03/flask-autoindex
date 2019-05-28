@@ -5,4 +5,4 @@ recursive-include flask_autoindex/static *
 recursive-include flask_autoindex/templates *
 include docs/*.rst docs/conf.py
 recursive-include docs/_static *
-recursive-include docs/_themes *.py *.css *.css_t *.conf *.html LICENSE README
+recursive-include docs/_themes *.py *.css *.css_t *.conf *.html LICENSE README.md
