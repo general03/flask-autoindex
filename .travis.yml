@@ -21,7 +21,7 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
   - gem install travis
-  - travis encrypt SECURE_GH_TOKEN=${GH_TOKEN} --add --repo ${GH_COMPANY}/${NAME_REPO} --org
+  - travis encrypt SECURE_GH_TOKEN=${GH_TOKEN} --add --repo ${GH_COMPANY}/${NAME_REPO} --org --no-interactive
   - git config --global user.email ${GH_EMAIL};   
   - git config --global user.name ${GH_USER};
   - git config credential.helper "store --file=.git/credentials"   
