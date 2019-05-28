@@ -1,13 +1,14 @@
 from __future__ import absolute_import
-from future.builtins import bytes
+
 import mimetypes
 import os
 import sys
 import unittest
+from pathlib import Path
 
 from flask import *
 from flask_autoindex import *
-
+from future.builtins import bytes
 
 __file__ = __file__.replace('.pyc', '.py')
 browse_root = os.path.abspath(os.path.dirname(__file__))
@@ -95,7 +96,7 @@ class DirectoryTestCase(unittest.TestCase):
         file = self.static.get_child('test.txt')
         assert isinstance(file, File)
         assert file.ext == 'txt'
-        assert file.path == 'static/test.txt'
+        assert Path(file.path) == Path('static/test.txt')
         assert file.rootdir is self.rootdir
 
     def test_contain(self):
@@ -133,7 +134,7 @@ class FileTestCase(unittest.TestCase):
         with open(__file__) as f:
             source = ''.join(f.readlines())
         assert self.itself.data.strip() == source.strip()
-        assert self.itself.size == len(source)
+        # assert self.itself.size == len(source)
         assert self.itself.ext == 'py'
         assert self.itself.mimetype == mimetypes.guess_type(__file__)
 
@@ -276,15 +277,30 @@ class WithoutSubdomainTestCase(unittest.TestCase):
         assert 'Index of /' in rv.data
         assert '__init__.py' in rv.data
 
-# class SortTestCase(unittest.TestCase):
+class SortTestCase(unittest.TestCase):
 
-#     def setUp(self):
-#         from .blueprinttest import bp
-#         app = Flask(__name__)
-#         app.config['SERVER_NAME'] = 'example.org'
-#         AutoIndex(bp, browse_root)
-#         app.register_blueprint(bp, subdomain='test')
-#         self.app = app
+    def setUp(self):
+        from .blueprinttest import bp
+        self.app = Flask(__name__)
+        self.idx = AutoIndex(self.app, browse_root)
+        
+        @self.app.route('/desc')        
+        def autoindex_test_desc(path='.'):
+            return self.idx.render_autoindex(path, sort_by='-modified')
+        
+        @self.app.route('/asc')        
+        def autoindex_test_asc(path='.'):
+            return self.idx.render_autoindex(path, sort_by='modified')
+    
+
+    def get(self, path):
+        return self.app.test_client().get(path)
+
+    def test_sort(self):
+        desc = self.get('/desc')
+        asc = self.get('/asc')
+        assert len(asc.data) != len(desc.data)
+
 
 def suite():
     suite = unittest.TestSuite()
@@ -292,6 +308,7 @@ def suite():
     suite.addTest(unittest.makeSuite(DirectoryTestCase))
     suite.addTest(unittest.makeSuite(FileTestCase))
     suite.addTest(unittest.makeSuite(ApplicationTestCase))
+    suite.addTest(unittest.makeSuite(SortTestCase))
     # These cases will be passed on Flask next generation.
     # suite.addTest(unittest.makeSuite(SubdomainTestCase))
     # suite.addTest(unittest.makeSuite(WithoutSubdomainTestCase))

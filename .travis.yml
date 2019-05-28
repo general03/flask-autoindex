@@ -8,7 +8,7 @@ python:
 
 virtualenv:
   system_site_packages: true
-  
+
 env:
   global:
     - CC_TEST_REPORTER_ID=$CODECLIMATE_REPORTER_ID
@@ -32,7 +32,7 @@ before_script:
   - git remote set-url origin https://${GH_TOKEN}@${GH_REPO};
 
 script:
-  - pytest
+  - python setup.py test
 
 
 after_success:

@@ -20,3 +20,7 @@ AutoIndex(app, browse_root=os.path.curdir)
 if __name__ == '__main__':
     app.run()
 ```
+
+## Test
+
+`python setup.py test`
