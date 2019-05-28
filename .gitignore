@@ -9,3 +9,6 @@
 build
 dist
 docs/_build
+
+# Test
+__pycache__
