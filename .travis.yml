@@ -6,9 +6,6 @@ python:
   - "3.6"
   - "3.7"
 
-virtualenv:
-  system_site_packages: true
-
 env:
   global:
     - CC_TEST_REPORTER_ID=$CODECLIMATE_REPORTER_ID
