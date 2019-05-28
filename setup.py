@@ -30,7 +30,7 @@ def run_tests():
 setup(
     name='Flask-AutoIndex',
     version='0.6.3',
-    license='BSD',
+    license='MIT',
     author='RIGAUDIE David',
     url='http://pythonhosted.org/Flask-AutoIndex',
     description='The mod_autoindex for Flask',
@@ -47,10 +47,9 @@ setup(
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'

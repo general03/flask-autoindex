@@ -1,0 +1,67 @@
+language: python
+
+env:
+  global:
+    - CC_TEST_REPORTER_ID=$CODECLIMATE_REPORTER_ID
+    - GH_COMPANY=$GH_COMPANY
+    - GH_USER=$GH_USER
+    - GH_EMAIL=$GH_EMAIL
+    - NAME_REPO=$NAME_REPO
+    - GH_REPO="github.com/${GH_COMPANY}/${NAME_REPO}.git"
+
+python:
+  - "3.5"
+  - "3.6"
+  - "3.7"
+
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+  - gem install travis
+  - travis encrypt SECURE_GH_TOKEN=${GH_TOKEN} --add --repo ${GH_COMPANY}/${NAME_REPO} --org
+  - git config --global user.email ${GH_EMAIL};   
+  - git config --global user.name ${GH_USER};
+  - git config credential.helper "store --file=.git/credentials"   
+  - echo "https://${SECURE_GH_TOKEN}:@github.com" > .git/credentials 
+  - git remote set-url origin https://${GH_TOKEN}@${GH_REPO};
+
+script:
+  - pytest
+
+
+after_success:
+  # Get last message commit, extract name tag
+  # 
+  - TAG_TO_CREATE=`git log -1 --pretty=%B | grep -oP "CREATE TAG v?\K([0-9.]*)"`
+  - |
+    if [ ${TAG_TO_CREATE} ]; then
+      git checkout master;
+      git merge;
+
+      BEFORE_LAST_COMMIT_TAG=`git log --skip=1 --grep="CREATE TAG" --pretty=%H`;
+      NEW_CHANGELOG=`git log ${BEFORE_LAST_COMMIT_TAG}.. --no-merges --pretty=format:'- %s'`;
+
+      echo $BEFORE_LAST_COMMIT_TAG;
+      echo ${NEW_CHANGELOG};
+
+      sed -i '1s/^/### Added\n\n/' CHANGELOG.md;
+      # sed -i "1s/^/##[echo $BEFORE_LAST_COMMIT_TAG]\n\n/" CHANGELOG.md;
+      sed "s/ /$NEW_CHANGELOG/" CHANGELOG.md;
+
+      echo "Adding changelog...";
+      git add CHANGELOG.md;
+      git commit -m "AUTO GENERATE CHANGELOG";
+      git push origin master;
+      
+      echo "Pushing tag...";
+      git tag -a v${TAG_TO_CREATE} -m "AUTO CREATE TAG ${TAG_TO_CREATE} FROM $TRAVIS_BUILD_NUMBER";
+      git push -u https://${GH_TOKEN}@${GH_REPO} v${TAG_TO_CREATE};
+    fi
+
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
+
+
+

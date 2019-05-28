@@ -276,6 +276,15 @@ class WithoutSubdomainTestCase(unittest.TestCase):
         assert 'Index of /' in rv.data
         assert '__init__.py' in rv.data
 
+# class SortTestCase(unittest.TestCase):
+
+#     def setUp(self):
+#         from .blueprinttest import bp
+#         app = Flask(__name__)
+#         app.config['SERVER_NAME'] = 'example.org'
+#         AutoIndex(bp, browse_root)
+#         app.register_blueprint(bp, subdomain='test')
+#         self.app = app
 
 def suite():
     suite = unittest.TestSuite()
