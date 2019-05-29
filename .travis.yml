@@ -27,14 +27,12 @@ before_script:
   - git config credential.helper "store --file=.git/credentials"   
   - echo "https://${SECURE_GH_TOKEN}:@github.com" > .git/credentials 
   - git remote set-url origin https://${GH_TOKEN}@${GH_REPO};
-  - pip install coverage coveralls
+  - pip install coverage
 
 script:
   - coverage run ./setup.py test
 
 after_success:
-  - coverage report -m
-  - coveralls
   # Get last message commit, extract name tag
   # 
   - TAG_TO_CREATE=`git log -1 --pretty=%B | grep -oP "CREATE TAG v?\K([0-9.]*)"`
@@ -62,6 +60,7 @@ after_success:
       git tag -a v${TAG_TO_CREATE} -m "AUTO CREATE TAG ${TAG_TO_CREATE} FROM $TRAVIS_BUILD_NUMBER";
       git push -u https://${GH_TOKEN}@${GH_REPO} v${TAG_TO_CREATE};
     fi
+  - coverage report -m
 
 after_script:
   - ./cc-test-reporter after-build -t coverage.py --exit-code $TRAVIS_TEST_RESULT
