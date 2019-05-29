@@ -64,7 +64,7 @@ after_success:
     fi
 
 after_script:
-  - coverage xml -i
+  - coverage xml
   - ./cc-test-reporter after-build coverage.xml --debug --prefix $(readlink -f .) --exit-code $TRAVIS_TEST_RESULT
 
 
