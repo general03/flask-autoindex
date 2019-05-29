@@ -1,4 +1,6 @@
-Flask-AutoIndex
+[![Build Status](https://travis-ci.org/general03/flask-autoindex.svg?branch=master)](https://travis-ci.org/general03/flask-autoindex)
+[![Maintainability](https://api.codeclimate.com/v1/badges/869c538c7fe4f09a5e72/maintainability)](https://codeclimate.com/github/general03/flask-autoindex/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/869c538c7fe4f09a5e72/test_coverage)](https://codeclimate.com/github/general03/flask-autoindex/test_coverage)
 
 A mod_autoindex for Flask
 
