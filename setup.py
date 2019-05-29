@@ -29,7 +29,7 @@ def run_tests():
 
 setup(
     name='Flask-AutoIndex',
-    version='0.6.3',
+    version='0.6.4',
     license='MIT',
     author='RIGAUDIE David',
     url='http://pythonhosted.org/Flask-AutoIndex',

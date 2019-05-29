@@ -9,6 +9,7 @@
 build
 dist
 docs/_build
+.pypirc
 
 # Test
 __pycache__
