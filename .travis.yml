@@ -44,7 +44,7 @@ after_success:
       git merge;
 
       BEFORE_LAST_COMMIT_TAG=`git log --skip=1 --grep="CREATE TAG" --pretty=%H`;
-      NEW_CHANGELOG=`git log ${BEFORE_LAST_COMMIT_TAG}.. --no-merges --pretty=format:'- %s'`;
+      NEW_CHANGELOG=`git log --no-merges ${BEFORE_LAST_COMMIT_TAG}.. --pretty=format:'- %s'`;
 
       echo $BEFORE_LAST_COMMIT_TAG;
       echo ${NEW_CHANGELOG};
