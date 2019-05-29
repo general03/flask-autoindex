@@ -65,7 +65,7 @@ after_success:
   - coverage html -d coverage_html -i
 
 after_script:
-  - ./cc-test-reporter after-build coverage_html.html --debug -t coverage.py --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build coverage_html.html --debug --exit-code $TRAVIS_TEST_RESULT
 
 
 
