@@ -65,7 +65,7 @@ after_success:
   - coverage xml -i
 
 after_script:
-  - ./cc-test-reporter after-build coverage.xml --debug --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build coverage.xml --debug --prefix=tests --exit-code $TRAVIS_TEST_RESULT
 
 
 
