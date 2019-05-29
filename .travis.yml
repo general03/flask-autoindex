@@ -32,7 +32,7 @@ before_script:
   - pip install coverage
 
 script:
-  - coverage run --source=flask_autoindex,tests ./setup.py test
+  - coverage run --source=flask_autoindex ./setup.py test
 
 after_success:
   # Get last message commit, extract name tag
@@ -62,10 +62,9 @@ after_success:
       git tag -a v${TAG_TO_CREATE} -m "AUTO CREATE TAG ${TAG_TO_CREATE} FROM $TRAVIS_BUILD_NUMBER";
       git push -u https://${GH_TOKEN}@${GH_REPO} v${TAG_TO_CREATE};
     fi
-  - coverage xml -i
 
 after_script:
-  - echo $(readlink -f .)
+  - coverage xml -i
   - ./cc-test-reporter after-build coverage.xml --debug --prefix $(readlink -f .) --exit-code $TRAVIS_TEST_RESULT
 
 
