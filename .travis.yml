@@ -62,10 +62,10 @@ after_success:
       git tag -a v${TAG_TO_CREATE} -m "AUTO CREATE TAG ${TAG_TO_CREATE} FROM $TRAVIS_BUILD_NUMBER";
       git push -u https://${GH_TOKEN}@${GH_REPO} v${TAG_TO_CREATE};
     fi
-  - coverage html -d coverage_html -i
+  - coverage xml -i
 
 after_script:
-  - ./cc-test-reporter after-build coverage_html.html --debug -t coverage.py --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build coverage.xml --debug --exit-code $TRAVIS_TEST_RESULT
 
 
 
