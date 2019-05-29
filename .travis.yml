@@ -66,7 +66,7 @@ after_success:
 
 after_script:
   - echo $(readlink -f .)
-  - ./cc-test-reporter after-build coverage.xml --debug --prefix $(readlink -f .) --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build coverage.xml --debug --exit-code $TRAVIS_TEST_RESULT
 
 
 
