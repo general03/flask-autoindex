@@ -33,6 +33,7 @@ script:
   - coverage run ./setup.py test
 
 after_success:
+  - coverage report
   # Get last message commit, extract name tag
   # 
   - TAG_TO_CREATE=`git log -1 --pretty=%B | grep -oP "CREATE TAG v?\K([0-9.]*)"`
