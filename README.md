@@ -2,12 +2,20 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/869c538c7fe4f09a5e72/maintainability)](https://codeclimate.com/github/general03/flask-autoindex/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/869c538c7fe4f09a5e72/test_coverage)](https://codeclimate.com/github/general03/flask-autoindex/test_coverage)
 
+[![PyPI version](https://badge.fury.io/py/Flask-AutoIndex.svg)](https://badge.fury.io/py/Flask-AutoIndex)
+
 A mod_autoindex for Flask
 
 ## Requirements
 
 * Flask
 * Python >= 3.5
+
+## Install
+
+```
+pip install Flask-AutoIndex
+```
 
 ## Usage
 
