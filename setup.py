@@ -3,18 +3,17 @@ Flask-AutoIndex
 ---------------
 
 Flask-AutoIndex generates an index page for your `Flask`_ application
-automatically. The result just like `mod_autoindex`_, but the look is more
-awesome! Look at this:
+automatically. The result is similar to the one produced by the Apache
+module `mod_autoindex`_, but the look is more awesome!
 
-.. _Flask: http://flask.pocoo.org/
+.. _Flask: https://palletsprojects.com/p/flask/
 .. _mod_autoindex: http://httpd.apache.org/docs/current/mod/mod_autoindex.html
 
 Links
 `````
 
-* `documentation <http://packages.python.org/Flask-AutoIndex/>`_
-* `development version
-  <http://github.com/sublee/flask-autoindex/zipball/master#egg=flask-autoindex-dev>`_
+* `Documentation <https://pythonhosted.org/Flask-AutoIndex/>`_
+* `Code repository and issue tracker <https://github.com/general03/flask-autoindex>`_
 
 """
 import re
@@ -32,7 +31,7 @@ setup(
     version='0.6.4',
     license='MIT',
     author='RIGAUDIE David',
-    url='http://pythonhosted.org/Flask-AutoIndex',
+    url='https://pythonhosted.org/Flask-AutoIndex',
     description='The mod_autoindex for Flask',
     long_description=__doc__,
     packages=['flask_autoindex'],
