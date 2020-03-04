@@ -11,7 +11,7 @@ import re
 from future.utils import with_metaclass
 from future.moves.urllib.parse import urljoin
 from flask import url_for, send_file
-from werkzeug import cached_property
+from werkzeug.utils import cached_property
 
 
 Default = None

@@ -7,7 +7,7 @@ from flask import *
 from flask_silk import Silk
 from future.builtins import object, str
 from jinja2 import FileSystemLoader, TemplateNotFound
-from werkzeug import cached_property
+from werkzeug.utils import cached_property
 
 from . import icons
 from .entry import *
