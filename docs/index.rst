@@ -31,7 +31,7 @@ a default style. You can also design your own style.
 Installation
 ============
 
-Version 0.6.4 requires Python >= 3.5; previous versions also work with Python 2.
+Version 0.6.4 requires Python >= 3.5; Versions < 0.6 also work with Python 2.
 
 Install Flask-AutoIndex with ``pip``::
 
