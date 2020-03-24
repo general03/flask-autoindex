@@ -12,7 +12,7 @@ module `mod_autoindex`_, but the look is more awesome!
 Links
 `````
 
-* `Documentation <https://pythonhosted.org/Flask-AutoIndex/>`_
+* `Documentation <https://flask-autoindex.readthedocs.io/>`_
 * `Code repository and issue tracker <https://github.com/general03/flask-autoindex>`_
 
 """
@@ -31,7 +31,7 @@ setup(
     version='0.6.5',
     license='MIT',
     author='RIGAUDIE David',
-    url='https://pythonhosted.org/Flask-AutoIndex',
+    url='https://flask-autoindex.readthedocs.io',
     description='The mod_autoindex for Flask',
     long_description=__doc__,
     packages=['flask_autoindex'],
