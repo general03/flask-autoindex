@@ -9,7 +9,7 @@ A mod_autoindex for Flask
 ## Requirements
 
 * Flask
-* Python >= 3.5
+* Python >= 3.6
 
 ## Install
 
