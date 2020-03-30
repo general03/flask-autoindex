@@ -31,6 +31,8 @@ if __name__ == '__main__':
     app.run()
 ```
 
+`flask run`
+
 ## Test
 
 `python setup.py test`
