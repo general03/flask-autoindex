@@ -28,7 +28,7 @@ def run_tests():
 
 setup(
     name='Flask-AutoIndex',
-    version='0.6.5',
+    version='0.6.6',
     license='MIT',
     author='RIGAUDIE David',
     url='https://flask-autoindex.readthedocs.io',
