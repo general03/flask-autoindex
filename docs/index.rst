@@ -3,6 +3,9 @@ Flask-AutoIndex
 
 .. module:: flask_autoindex
 
+.. figure:: _static/flask-autoindex.png
+   :alt: The Flask-AutoIndex logo
+
 Flask-AutoIndex generates an index page for your `Flask`_ application
 automatically. The result is similar to the one produced by the Apache
 module `mod_autoindex`_, but the look is more awesome! Look at this:
