@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import mimetypes
 import os
 import sys
@@ -8,22 +6,19 @@ from pathlib import Path
 
 from flask import *
 from flask_autoindex import *
-from future.builtins import bytes
 
 __file__ = __file__.replace('.pyc', '.py')
 browse_root = os.path.abspath(os.path.dirname(__file__))
 
-
-if sys.version_info < (3,):
-    b = lambda s: s
-else:
-    b = lambda s: bytes(s, 'ascii')
+b = lambda s: bytes(s, 'ascii')
 
 
 class RootDirectoryTestCase(unittest.TestCase):
 
     def setUp(self):
         self.rootdir = RootDirectory(browse_root)
+
+        print(self.rootdir)
 
     def test_root_dir(self):
         assert isinstance(self.rootdir, RootDirectory)

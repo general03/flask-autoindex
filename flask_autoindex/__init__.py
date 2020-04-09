@@ -1,22 +1,19 @@
-from __future__ import absolute_import
-
 import os
 import re
 
 from flask import *
 from flask_silk import Silk
-from future.builtins import object, str
 from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.utils import cached_property
 
 from . import icons
 from .entry import *
 
-__version__ = '0.6.3'
+__version__ = '0.6.6'
 __autoindex__ = '__autoindex__'
 
 
-class AutoIndex(object):
+class AutoIndex:
     """This class makes the Flask application to serve automatically
     generated index page. The wrapped application will route ``/`` and
     ``/<path:path>`` when ``add_url_rules`` is ``True``. Here's a simple

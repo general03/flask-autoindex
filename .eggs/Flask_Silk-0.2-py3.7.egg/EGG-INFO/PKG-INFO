@@ -1,0 +1,33 @@
+Metadata-Version: 1.1
+Name: Flask-Silk
+Version: 0.2
+Summary: Adds silk icons to your Flask application or blueprint, or extension.
+Home-page: http://github.com/sublee/flask-silk
+Author: Heungsub Lee
+Author-email: sub@subl.ee
+License: BSD
+Description: 
+        Flask-Silk
+        ----------
+        
+        Adds `silk`_ icons to your Flask application or blueprint, or extension.
+        
+        Links
+        `````
+        
+        * `documentation <http://packages.python.org/Flask-Silk>`_
+        * `development version
+          <http://github.com/sublee/flask-silk/zipball/master#egg=flask-silk-dev>`_
+        
+        .. _silk: http://www.famfamfam.com/lab/icons/silk
+        
+        
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

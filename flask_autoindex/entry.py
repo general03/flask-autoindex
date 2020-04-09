@@ -1,6 +1,3 @@
-from past.builtins import cmp
-from future import standard_library
-standard_library.install_hooks()
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from fnmatch import fnmatch
@@ -8,8 +5,8 @@ from mimetypes import guess_type
 import functools
 import os
 import re
-from future.utils import with_metaclass
-from future.moves.urllib.parse import urljoin
+import operator
+from urllib.parse import urljoin
 from flask import url_for, send_file
 from werkzeug.utils import cached_property
 
@@ -51,7 +48,7 @@ class _EntryMeta(type):
         return ent
 
 
-class Entry(with_metaclass(_EntryMeta, object)):
+class Entry(_EntryMeta):
     """This class wraps file or directory. It is an abstract class, but it
     returns a derived instance. You can make an instance such as::
 
@@ -148,8 +145,11 @@ class Entry(with_metaclass(_EntryMeta, object)):
             except AttributeError:
                 raise GuessError('There is no matched icon.')
         try:
+            print(url_for('.silkicon', filename=''))
             return urljoin(url_for('.silkicon', filename=''), get_icon_url())
-        except (AttributeError, RuntimeError):
+        except (AttributeError, RuntimeError) as e:
+            print('""""""""""""')
+            print(e)
             return 'ERROR'
             return get_icon_url()
 
@@ -236,10 +236,10 @@ class Directory(Entry):
                     return 1 if type(ent1) is File else -1
                 else:
                     try:
-                        return cmp(getattr(ent1, sort_by),
+                        return operator.eq(getattr(ent1, sort_by),
                                    getattr(ent2, sort_by))
                     except AttributeError:
-                        return cmp(getattr(ent1, 'name'),
+                        return operator.eq(getattr(ent1, 'name'),
                                    getattr(ent2, 'name'))
             return asc() * order
         if not self.is_root():
@@ -296,7 +296,8 @@ class RootDirectory(Directory):
     def __new__(cls, path, autoindex=None):
         try:
             return RootDirectory._rootdirs[(path, autoindex)]
-        except KeyError:
+        except KeyError as e:
+            print(e)
             return object.__new__(cls)
 
     def __init__(self, path, autoindex=None):
