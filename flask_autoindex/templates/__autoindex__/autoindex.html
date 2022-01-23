@@ -5,7 +5,9 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Index of {{ curdir.path }}</title>
+  {% block title %}
+    <title>Index of {{ curdir.path }}</title>
+  {% endblock %}
   {% block meta %}
     <link rel="stylesheet" type="text/css"
       href="{{ url_for('__autoindex__.static', filename='autoindex.css') }}" />
