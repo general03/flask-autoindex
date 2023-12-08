@@ -6,6 +6,7 @@
 
 # Distribution
 *egg-info
+.eggs
 build
 dist
 docs/_build
