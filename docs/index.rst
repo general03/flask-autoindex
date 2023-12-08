@@ -242,14 +242,14 @@ See LICENSE.md_. Previous versions were licensed under the BSD_ license.
 
 The main author is `Heungsub Lee`_ up to version 0.6.2, and `David Rigaudie`_
 starting with version 0.6.4. Questions and patches are welcome, please use the
-issue tracker on the `Flask-Autoindex GitHub repository <fai_gh_repo>`_.
+issue tracker on the `Flask-Autoindex GitHub repository
+<https://github.com/general03/flask-autoindex>`_.
 
 .. _BSD: https://en.wikipedia.org/wiki/BSD_licenses
 .. _MIT: https://en.wikipedia.org/wiki/MIT_License
 .. _LICENSE.md: https://github.com/general03/flask-autoindex/blob/master/LICENSE.md
 .. _Heungsub Lee: https://subl.ee/
 .. _David Rigaudie: http://rigaudie.fr/
-.. _fai_gh_repo: https://github.com/general03/flask-autoindex
 
 Indices and tables
 ==================
